@@ -7,19 +7,82 @@
 ## sufficently large coverage
 ########################################################################################################################
 
-#' loading the required packages
-suppressPackageStartupMessages(library(RnBeads))
-suppressPackageStartupMessages(library(GenomicAlignments))
-suppressPackageStartupMessages(library(Rsamtools))
-suppressPackageStartupMessages(library(parallel))
-suppressPackageStartupMessages(library(rtracklayer))
-suppressPackageStartupMessages(library(doParallel))
-
 ## G L O B A L S #######################################################################################################
 
-WINDOW.SIZE <- 50
+IHS.OPTIONS <- new.env()
+assign('ALL',c('window.size','mapq.filter','max.reads','min.overlap','fdrp.type'),IHS.OPTIONS)
+assign('WINDOW.SIZE',50,IHS.OPTIONS)
+assign('MAPQ.FILTER',35,IHS.OPTIONS)
+assign('MAX.READS',40,IHS.OPTIONS)
+assign('MIN.OVERLAP',35,IHS.OPTIONS)
+assign('FDRP.TYPE','FDRP',IHS.OPTIONS)
+#'ALL' <- c('window.size','mapq.filter','max.reads','min.overlap','fdrp.type'),
+#' Window around the CpG site of interest to consider in FDRP and qFDRP calculation, the higher the value, the more
+#' likely it is to find heterogeneity
+#'WINDOW.SIZE' <- 50,
+#' mapq filter used to filter out low quality reads
+#'MAPQ.FILTER' <- 35,
+#' Maximum number of reads to be considered in FDRP and qFDRP calculation. The scores compute all pairs, therefore this
+#' is a crucial parameter for the running time of the calculation.
+#'MAX.READS' <- 40,
+#' Miniumum overlap between two reads to consider it as a read pair in FDRP/qFDRP calculation in bp.
+#'MIN.OVERLAP' <- 35,
+#' FDRP type to be used: either FDRP or qFDRP
+#' FDRP.TYPE' <- 'FDRP')
 
 ## F U N C T I O N S ###################################################################################################
+
+#' set.option
+#' Change global options for IHS score calculation
+#'
+#' @param window.size: Window around the CpG site of interest to consider in FDRP and qFDRP calculation, the higher the value, the more
+#' likely it is to find heterogeneity
+#' @param mapq.filer: mapq filter used to filter out low quality reads
+#' @param max.reads: Maximum number of reads to be considered in FDRP and qFDRP calculation. The scores compute all pairs, therefore this
+#' is a crucial parameter for the running time of the calculation.
+#' @param min.overlap: Miniumum overlap between two reads to consider it as a read pair in FDRP/qFDRP calculation in bp.
+#' @param fdrp.type: FDRP type to be used: either FDRP or qFDRP
+#' @export
+set.option <- function(window.size,
+                         mapq.filter,
+                         max.reads,
+                         min.overlap,
+                         fdrp.type){
+  if(!missing(window.size)) IHS.OPTIONS[['WINDOW.SIZE']] <- window.size
+  if(!missing(mapq.filter)) IHS.OPTIONS[['MAPQ.FILTER']] <- mapq.filter
+  if(!missing(max.reads)) IHS.OPTIONS[['MAX.READS']] <- max.reads
+  if(!missing(min.overlap)) IHS.OPTIONS[['MIN.OVERLAP']] <- min.overlap
+  if(!missing(fdrp.type)){
+    if(!(fdrp.type%in%c('FDRP','qFDRP'))) stop('Invalid Value for fdrp.type, either FDRP or qFDRP requred')
+    IHS.OPTIONS[['FDRP.TYPE']] <- fdrp.type
+  }
+}
+
+#' get.option
+#' Print the value of the global option
+#'
+#' @param names: string or character vector containing the names of the options to be printed
+#' @export
+get.option <- function(names){
+  if(!all(names %in% IHS.OPTIONS[['ALL']])){
+    stop(paste0('No option(s) available named: ',names[!(names%in%IHS.OPTIONS[['ALL']])]))
+  }
+  if('window.size'%in%names){
+    print(IHS.OPTIONS[['WINDOW.SIZE']])
+  }
+  if('mapq.filter'%in%names){
+    print(IHS.OPTIONS[['MAPQ.FILTER']])
+  }
+  if('max.reads'%in%names){
+    print(IHS.OPTIONS[['MAX.READS']])
+  }
+  if('min.overlap'%in%names){
+    print(IHS.OPTIONS[['MIN.OVERLAP']])
+  }
+  if('fdrp.type'%in%names){
+    print(IHS.OPTIONS[['FDRP.TYPE']])
+  }
+}
 
 #' convert
 #' This function converts a sequence representation as a string into a binary (TRUE/FALSE)
@@ -30,7 +93,7 @@ WINDOW.SIZE <- 50
 #' @return:	 TRUE, if the CpG dinucleotide was methylated at the given position and FALSE otherwise
 #'
 #' @author Michael Scherer
-
+#' @noRd
 convert <- function(y,string){
   if(nchar(string) >= y+2){
     s <- substr(string,y+1,y+2)
@@ -57,7 +120,7 @@ convert <- function(y,string){
 #'						Sequence variations and unmethylated CpG sites are treated in the same way.
 #'
 #' @author Michael Scherer
-
+#' @noRd
 toCpGs <- function(index,match_read_cpg,starts_cpgs,starts_reads,seqs_reads){
   covered_cpgs <- match_read_cpg[[index]]
   start_cpgs <- starts_cpgs[covered_cpgs]
@@ -80,14 +143,14 @@ toCpGs <- function(index,match_read_cpg,starts_cpgs,starts_reads,seqs_reads){
 #'						another
 #'
 #' @author Michael Scherer
-
+#' @noRd
 restrict <- function(positions,cpg){
   #' We only restrict something, if the read is longer than 50 bp
   if(!any(positions == cpg)) return(NA)
   distances <- abs(as.numeric(positions)-as.numeric(cpg))
-  positions <- positions[distances<=WINDOW.SIZE]
-  if((as.numeric(positions)[length(positions)]-as.numeric(positions)[1])>WINDOW.SIZE){
-    distances <- distances[distances<=WINDOW.SIZE]
+  positions <- positions[distances<=get.option('window.size')]
+  if((as.numeric(positions)[length(positions)]-as.numeric(positions)[1])>get.option('window.size')){
+    distances <- distances[distances<=get.option('window.size')]
     end <- length(distances)
     remove <- rep(FALSE,end)
     pos <- match(cpg,positions)
@@ -109,7 +172,7 @@ restrict <- function(positions,cpg){
           next
         }
         right <- distances[i.right]
-        if(WINDOW.SIZE < (left + right)){
+        if(get.option('window.size') < (left + right)){
           remove[i.right:end] <- TRUE
           finished.right <- TRUE
           i.right <- max(which(!remove))
@@ -122,7 +185,7 @@ restrict <- function(positions,cpg){
           next
         }
         left <- distances[i.left]
-        if(WINDOW.SIZE < (left + right)){
+        if(get.option('window.size') < (left + right)){
           remove[1:i.left] <- TRUE
           finished.left <- TRUE
           i.left <- min(which(!remove))
@@ -136,7 +199,7 @@ restrict <- function(positions,cpg){
             next
           }
           left <- distances[i.left]
-          if(WINDOW.SIZE < (left + right)){
+          if(get.option('window.size') < (left + right)){
             remove[1:i.left] <- TRUE
             finished.left <- TRUE
             i.left <- min(which(!remove))
@@ -149,7 +212,7 @@ restrict <- function(positions,cpg){
             next
           }
           right <- distances[i.right]
-          if(WINDOW.SIZE < (left + right)){
+          if(get.option('window.size') < (left + right)){
             remove[i.right:end] <- TRUE
             finished.right <- TRUE
             i.right <- max(which(!remove))
@@ -178,7 +241,7 @@ restrict <- function(positions,cpg){
 #' 				as discordant.
 #'
 #' @author Michael Scherer
-
+#' @noRd
 compute.discordant <- function(index,read1,read2,values,site){
   #' this is the first read
   q <- read1[index]
@@ -212,11 +275,15 @@ compute.discordant <- function(index,read1,read2,values,site){
   intersection2 <- intersection2[!is.na(intersection2)]
   #' two reads are only concordant to each other if they reflect the same methylation
   #' state at each position covered by the reads
-  discordant <- any(intersection1 != intersection2)
+  if(get.option('fdrp.type')=='FDRP'){
+    discordant <- any(intersection1 != intersection2)
+  }else{
+    discordant <- (sum(intersection1 != intersection2))/length(intersection1)
+  }
   discordant
 }
 
-#' compute.fdrp
+#' calculate.fdrp.site
 #' This function compute the FDRP score for a given cpg site.
 #'
 #' @param pos:		index of the cpg site
@@ -231,8 +298,8 @@ compute.discordant <- function(index,read1,read2,values,site){
 #' 				the chormosome and calls compute.discordant for each pair of reads.
 #'
 #' @author Michael Scherer
-
-compute.fdrp <- function(pos,cpg,reads,site){
+#' @export
+calculate.fdrp.site <- function(pos,cpg,reads,site){
   cpg <- cpg[[pos]]
   site <- site[[pos]]
   #' we only consider the calculation if there are more than 2 reads for this CpG site
@@ -242,15 +309,15 @@ compute.fdrp <- function(pos,cpg,reads,site){
   #' the maximum number of reads to be calculated is 40, which already are
   #' (1/2)*39*40 = 780 read pairs for a single site. Otherwise 40 reads are
   #' are sampled from the all reads.
-  if(length(cpg)>40){
-    cpg <- sample(cpg,40)
+  if(length(cpg)>get.option('max.reads')){
+    cpg <- sample(cpg,get.option('max.reads'))
   }
   selected <- reads[cpg]
   rm(reads)
 
   #' here we calculate all pairs of the reads that the corresponding CpG site covers
   #' we require the overlap to be at least 35 bp long
-  overlap <- findOverlaps(selected,selected,minoverlap=35,ignore.strand=TRUE)
+  overlap <- findOverlaps(selected,selected,minoverlap=get.option('min.overlap'),ignore.strand=TRUE)
   query <- queryHits(overlap)
   if(length(query)==0){
     return(NA)
@@ -267,14 +334,14 @@ compute.fdrp <- function(pos,cpg,reads,site){
   rm(selected)
   #' query is as long as all read pairs we want to consider at this specific position
   ret <- as.list(1:length(query))
-  ret <- lapply(ret,compute.discordant,query,subject,values,site)
+  ret <- lapply(ret,compute.discordant,query,subject,values,site,type)
   ret <- unlist(ret)
-  #' we acutally calculate the FDRP as \frac{#discordant read pairs}{#all read pairs}
+  #' we actually calculate the FDRP as \frac{#discordant read pairs}{#all read pairs}
   fdrp <- sum(ret,na.rm=TRUE)/length(ret)
   fdrp
 }
 
-#' calculate.fdrps.chromosome
+#' calculate.fdrp.by.chromosome
 #' This function calculates the FDRP scores for the reads given in the bam files
 #' for the CpGs present in the annotation.
 #'
@@ -287,8 +354,8 @@ compute.fdrp <- function(pos,cpg,reads,site){
 #'				separately and calls toCpG as well as compute.fdrp.
 #'
 #' @author Michael Scherer
-
-calculate.fdrps.chromosome <- function(bam, anno){
+#' @export
+calculate.fdrp.by.chromosome <- function(bam, anno){
   chromosome <- as.character(seqnames(anno))[1]
   logger.start(paste('Calculation of',chromosome))
   start <- start(ranges(anno)[1])
@@ -298,7 +365,7 @@ calculate.fdrps.chromosome <- function(bam, anno){
   }
   which <- paste0(chromosome,":",start,"-",end)
   which <- GRanges(which)
-  param <- ScanBamParam(which=which,what="seq",mapqFilter=35,flag=scanBamFlag(isNotPassingQualityControls=FALSE,isDuplicate=FALSE))
+  param <- ScanBamParam(which=which,what="seq",mapqFilter=get.option('mapq.filter'),flag=scanBamFlag(isNotPassingQualityControls=FALSE,isDuplicate=FALSE))
   reads <- readGAlignments(bam,param=param)
 
   range_reads <- GRanges(reads)
@@ -349,7 +416,7 @@ calculate.fdrps.chromosome <- function(bam, anno){
   match_cpg_reads <- match_cpg_reads[null]
   starts_cpgs <- starts_cpgs[null]
   toApply <- 1:length(starts_cpgs)
-  fdrps_actual <- lapply(toApply,compute.fdrp,match_cpg_reads,range_reads,starts_cpgs)
+  fdrps_actual <- lapply(toApply,calculate.fdrp.site,match_cpg_reads,range_reads,starts_cpgs,type)
   #' when we do not have a read that covers this site, we set the FDRP for this site to NA
   fdrps[null] <- fdrps_actual
   fdrps <- unlist(fdrps)
@@ -359,7 +426,7 @@ calculate.fdrps.chromosome <- function(bam, anno){
   fdrps
 }
 
-#' split.anno
+#' anno.split
 #' This function splits an annotation as a GRanges object into a GRangesList
 #' with two entries.
 #'
@@ -371,8 +438,8 @@ calculate.fdrps.chromosome <- function(bam, anno){
 #' the two annotations are equally sized in the end.
 #'
 #' @author Michael Scherer
-
-split.anno <- function(anno){
+#' @noRd
+anno.split <- function(anno){
   start <- start(ranges(anno)[1])
   end <- end(ranges(anno)[length(anno)])
   end <- round(end/2,0)
@@ -381,7 +448,8 @@ split.anno <- function(anno){
   return(GRangesList(part1,part2))
 }
 
-#' calculate.fdrps
+#' calculate.fdrp
+#'
 #' This function calculates the FDRPs for all CpG sites in
 #' the annotation from the reads provided by the bam file.
 #'
@@ -393,14 +461,11 @@ split.anno <- function(anno){
 #' @param window.size:	window size used to restrict the concordance/discordance classification of each read pair
 #' 						DEFAULT: 50 as the maximum distance
 #'
-#' This function writes the FDRP scores into the given directory as a csv-file.
+#' @return FDRP scores for the given annotation.
 #'
 #' @author Michael Scherer
-
-calculate.fdrps<- function(bam_file,anno,path,output_name,cores=1,window.size){
-  if(!missing(window.size)){
-    WINDOW.SIZE <<- window.size
-  }
+#' @export
+calculate.fdrp <- function(bam_file,anno,path=getwd(),output_name,cores=1,window.size=get.option('WINDOW.SIZE')){
   bam <- BamFile(bam_file)
   if(!file.exists(file.path(path,'log'))){
     dir.create(file.path(path,'log'))
@@ -411,15 +476,39 @@ calculate.fdrps<- function(bam_file,anno,path,output_name,cores=1,window.size){
   anno <- anno[lengths(anno)>0]
   if(length(anno)>=22){
     anno <- anno[1:22]
-    first <- split.anno(anno[[1]])
+    first <- anno.split(anno[[1]])
     anno <- c(first,anno[2:22])
-    second <- split.anno(anno[[3]])
+    second <- anno.split(anno[[3]])
     anno <- c(anno[1:2],second,anno[4:23])
   }
-  fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrps.chromosome','compute.fdrp','compute.discordant','toCpGs','bam','convert','restrict','WINDOW.SIZE')) %dopar%{
-    calculate.fdrps.chromosome(bam,chromosome)
+  fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrps.chromosome','compute.fdrp','compute.discordant','toCpGs','bam','convert','restrict','IHS.OPTIONS')) %dopar%{
+    calculate.fdrp.by.chromosome(bam,chromosome,type)
   }
   stopCluster(cl)
   fdrps <- unlist(fdrps)
-  write.csv(fdrps,paste0(path,output_name,".csv"),row.names=FALSE)
+  return(fdrps)
+}
+
+#' calculate.qfdrp
+#'
+#' This function calculates the qFDRP scores for the reads given in the bam files
+#' for the CpGs present in the annotation.
+#'
+#' @param bam_file:	bam file with the reads from a bisulfite sequencing technique
+#'				already aligned to a reference genome
+#' @param anno:	annotation as a GRanges object with the CpG sites to be analyzed
+#' @param path:			path to a folder where the FDRP CSV file should be written out
+#' @param output_name:	name of the output file
+#' @param cores:		number of cores available for the analysis
+#' @param window.size:	window size used to restrict the concordance/discordance classification of each read pair
+#' 						DEFAULT: 50 as the maximum distance
+#'
+#' @return qFDRP scores for the given annotation.
+#'
+#' @author Michael Scherer
+#' @export
+calculate.qfdrp <- function(bam_file,anno,path=getwd(),output_name,cores=1,window.size=get.option('WINDOW.SIZE')){
+  set.option(fdrp.type='qFDRP')
+  qfdrp <- calculate.fdrp(bam_file,anno,path,output_name,cores,window.size)
+  return(qfdrp)
 }
