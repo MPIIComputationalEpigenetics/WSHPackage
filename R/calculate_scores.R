@@ -10,12 +10,14 @@
 ## G L O B A L S #######################################################################################################
 
 IHS.OPTIONS <- new.env()
-assign('ALL',c('window.size','mapq.filter','max.reads','min.overlap','fdrp.type'),IHS.OPTIONS)
+assign('ALL',c('window.size','mapq.filter','max.reads','min.overlap','fdrp.type','coverage.threshold','methclone.methylation.diff'),IHS.OPTIONS)
 assign('WINDOW.SIZE',50,IHS.OPTIONS)
 assign('MAPQ.FILTER',35,IHS.OPTIONS)
 assign('MAX.READS',40,IHS.OPTIONS)
 assign('MIN.OVERLAP',35,IHS.OPTIONS)
 assign('FDRP.TYPE','FDRP',IHS.OPTIONS)
+assign('COVERAGE.THRESHOLD',10,IHS.OPTIONS)
+assign('METHCLONE.METHYLATION.DIFF',0,IHS.OPTIONS)
 #'ALL' <- c('window.size','mapq.filter','max.reads','min.overlap','fdrp.type'),
 #' Window around the CpG site of interest to consider in FDRP and qFDRP calculation, the higher the value, the more
 #' likely it is to find heterogeneity
@@ -47,11 +49,15 @@ set.option <- function(window.size,
                          mapq.filter,
                          max.reads,
                          min.overlap,
-                         fdrp.type){
+                         fdrp.type,
+                       coverage.threshold,
+                       methclone.methylation.diff){
   if(!missing(window.size)) IHS.OPTIONS[['WINDOW.SIZE']] <- window.size
   if(!missing(mapq.filter)) IHS.OPTIONS[['MAPQ.FILTER']] <- mapq.filter
   if(!missing(max.reads)) IHS.OPTIONS[['MAX.READS']] <- max.reads
   if(!missing(min.overlap)) IHS.OPTIONS[['MIN.OVERLAP']] <- min.overlap
+  if(!missing(coverage.threshold)) IHS.OPTIONS[['COVERAGE.THRESHOLD']] <- coverage.threshold
+  if(!missing(methclone.methylation.diff)) IHS.OPTIONS[['METHCLONE.METHYLATION.DIFF']] <- methclone.methylation.diff
   if(!missing(fdrp.type)){
     if(!(fdrp.type%in%c('FDRP','qFDRP'))) stop('Invalid Value for fdrp.type, either FDRP or qFDRP requred')
     IHS.OPTIONS[['FDRP.TYPE']] <- fdrp.type
@@ -67,21 +73,29 @@ get.option <- function(names){
   if(!all(names %in% IHS.OPTIONS[['ALL']])){
     stop(paste0('No option(s) available named: ',names[!(names%in%IHS.OPTIONS[['ALL']])]))
   }
+  ret <- c()
   if('window.size'%in%names){
-    print(IHS.OPTIONS[['WINDOW.SIZE']])
+    ret <- c(ret,window.size=IHS.OPTIONS[['WINDOW.SIZE']])
   }
   if('mapq.filter'%in%names){
-    print(IHS.OPTIONS[['MAPQ.FILTER']])
+    ret <- c(ret,mapq.filter=IHS.OPTIONS[['MAPQ.FILTER']])
   }
   if('max.reads'%in%names){
-    print(IHS.OPTIONS[['MAX.READS']])
+    ret <- c(ret,max.reads=IHS.OPTIONS[['MAX.READS']])
   }
   if('min.overlap'%in%names){
-    print(IHS.OPTIONS[['MIN.OVERLAP']])
+    ret <- c(ret,min.overlap=IHS.OPTIONS[['MIN.OVERLAP']])
+  }
+  if('coverage.threshold'%in%names){
+    ret <- c(ret,coverage.threshold=IHS.OPTIONS[['COVERAGE.THRESHOLD']])
+  }
+  if('methclone.methylation.diff'%in%names){
+    ret <- c(ret,methclone.methylation.diff=IHS.OPTIONS[['METHCLONE.METHYLATION.DIFF']])
   }
   if('fdrp.type'%in%names){
-    print(IHS.OPTIONS[['FDRP.TYPE']])
+    ret <- c(ret,fdrp.type=IHS.OPTIONS[['FDRP.TYPE']])
   }
+  return(ret[names])
 }
 
 #' convert
@@ -132,6 +146,43 @@ toCpGs <- function(index,match_read_cpg,starts_cpgs,starts_reads,seqs_reads){
   representation <- unlist(representation)
   representation
 }
+
+#' classify.read
+#' This functions classifies a read into either discordant (TRUE) or concordant (FALSE).
+#'
+#' @param index:			index of the read that should be converted to the custom representation
+#' @param match_read_cpg:	list containing the mapping from the reads to the CpG sites covered by
+#'							the read
+#' @param starts_cpgs:		vector of positions for the CpG sites
+#' @param starts_reads:		starting positions of the reads
+#' @param seqs_reads:		raw sequence of the read
+#' @return:				representation of the read as a logical value, where TRUE represents a discordant
+#'                 and FALSE a concordant read
+#'@details:				A read is classified as discordant, if the methylation levels found at all CpGs in the
+#'                 read are heterogeneous. That means if there is at least one methylated and one
+#'                 umethylated CpG, the read is discordant, otherwise concordant.
+#'
+#' @author Michael Scherer
+#' @noRd
+classify.read <- function(index,match_read_cpg,starts_cpgs,starts_reads,seqs_reads){
+  covered_cpgs <- match_read_cpg[[index]]
+  #' This is one of the criteria implemented in the PDR, each read has to contain at least 4 CpGs to
+  #' be used for the classification into discordant/concordant
+  if(length(covered_cpgs)<4){
+    return(NA)
+  }
+  start_cpgs <- starts_cpgs[covered_cpgs]
+  names(start_cpgs) <- start_cpgs
+  start_of_read <- starts_reads[index]
+  start_cpgs <- start_cpgs-start_of_read
+  sequence <- seqs_reads[index]
+  representation <- lapply(start_cpgs,convert,sequence)
+  representation <- unlist(representation)
+  #' A read is only concordant if all of the CpGs show the same methylation status
+  concordant <- (all(representation) || all(!representation))
+  return(!concordant)
+}
+
 
 #' compute.discordant
 #' This function restricts a read to those CpG sites that are at most WINDOW.SIZE away from one
@@ -334,12 +385,42 @@ calculate.fdrp.site <- function(pos,cpg,reads,site){
   rm(selected)
   #' query is as long as all read pairs we want to consider at this specific position
   ret <- as.list(1:length(query))
-  ret <- lapply(ret,compute.discordant,query,subject,values,site,type)
+  ret <- lapply(ret,compute.discordant,query,subject,values,site)
   ret <- unlist(ret)
   #' we actually calculate the FDRP as \frac{#discordant read pairs}{#all read pairs}
   fdrp <- sum(ret,na.rm=TRUE)/length(ret)
   fdrp
 }
+
+#' calculate.pdr.site
+#' This function computes the PDR score for a given cpg site.
+#'
+#' @param pos:		index of the cpg site
+#' @param reads:	GRanges object containing the reads needed for the calculation
+#'					of the PDR, already converted into the custom representation
+#' @return:			PDR score for the given CpG site
+#'
+#' @author Michael Scherer
+#' @export
+calculate.pdr.site <- function(cpg,reads){
+  #' we only consider the calculation if the cpg site is covered by more than 10 reads
+  #' Another requirement stated in the PDR paper
+  if(length(cpg)<10){
+    return(NA)
+  }
+
+  selected <- reads[cpg]
+  rm(reads)
+
+  #' We select the reads that contain the given CpG site
+  values <- values(selected)[,"isDiscordant"]
+  rm(selected)
+  #' we calculate the PDR as \frac{#discordant reads}{#all reads} that contain the given CpG
+  values <- unlist(values)
+  pdr <- mean(values,na.rm=TRUE)
+  pdr
+}
+
 
 #' calculate.fdrp.by.chromosome
 #' This function calculates the FDRP scores for the reads given in the bam files
@@ -351,9 +432,13 @@ calculate.fdrp.site <- function(pos,cpg,reads,site){
 #' @return:		vector of fdrp scores for the given CpG sites in anno
 #'
 #' @details:	This function is called by calculate.fdrps for each chromosome
-#'				separately and calls toCpG as well as compute.fdrp.
+#'				separately and calls toCpG as well as calculate.fdrp.site.
 #'
 #' @author Michael Scherer
+#'
+#' @import Rsamtools
+#' @import GenomicAlignments
+#' @import rtracklayer
 #' @export
 calculate.fdrp.by.chromosome <- function(bam, anno){
   chromosome <- as.character(seqnames(anno))[1]
@@ -416,7 +501,7 @@ calculate.fdrp.by.chromosome <- function(bam, anno){
   match_cpg_reads <- match_cpg_reads[null]
   starts_cpgs <- starts_cpgs[null]
   toApply <- 1:length(starts_cpgs)
-  fdrps_actual <- lapply(toApply,calculate.fdrp.site,match_cpg_reads,range_reads,starts_cpgs,type)
+  fdrps_actual <- lapply(toApply,calculate.fdrp.site,match_cpg_reads,range_reads,starts_cpgs)
   #' when we do not have a read that covers this site, we set the FDRP for this site to NA
   fdrps[null] <- fdrps_actual
   fdrps <- unlist(fdrps)
@@ -424,6 +509,89 @@ calculate.fdrp.by.chromosome <- function(bam, anno){
   logger.completed()
   logger.completed()
   fdrps
+}
+
+#' calculate.pdr.by.chromosome
+#'
+#' This function calculates the PDR scores for the reads given in the bam files
+#' for the CpGs present in the annotation.
+#'
+#' @param bam:	bam file with the reads from a bisulfite sequencing technique
+#'				already aligned to a reference genome
+#' @param anno:	annotation as a GRanges object with the CpG sites to be analyzed
+#' @return:		vector of pdr scores for the given CpG sites in anno
+#'
+#' @author Michael Scherer
+#'
+#' @import Rsamtools
+#' @import GenomicAlignments
+#' @import rtracklayer
+#' @export
+calculate.pdr.by.chromosome <- function(bam, anno){
+  chromosome <- as.character(seqnames(anno))[1]
+  logger.start(paste('Calculation of',chromosome))
+  start <- start(ranges(anno)[1])
+  end <- end(ranges(anno)[length(anno)])
+  if(!(chromosome %in% names(scanBamHeader(bam)[[1]]))){
+    chromosome <- unique(na.omit(as.numeric(unlist(strsplit(chromosome,"[^0-9]+")))))
+  }
+  which <- paste0(chromosome,":",start,"-",end)
+  which <- GRanges(which)
+  param <- ScanBamParam(which=which,what="seq",mapqFilter=get.option('mapq.filter'),flag=scanBamFlag(isNotPassingQualityControls=FALSE,isDuplicate=FALSE))
+  reads <- readGAlignments(bam,param=param)
+
+  range_reads <- GRanges(reads)
+  rm(reads)
+  newStyle <- mapSeqlevels(seqlevels(range_reads),'UCSC')
+  newStyle <- newStyle[!is.na(newStyle)]
+  range_reads <- renameSeqlevels(range_reads,newStyle)
+
+  #' we only analyze those CpGs that are covered (on average) by enough reads in the complete dataset
+  overlap <- findOverlaps(range_reads,anno,ignore.strand=TRUE)
+  query <- queryHits(overlap)
+  query <- unique(query)
+  range_reads <- range_reads[query]
+
+  ####### REPRESENTATION ############
+  #'This part clasifies all reads into either discordant or concordant
+  logger.start(paste('Representation',chromosome))
+  range_cpgs <- ranges(anno)
+  starts_cpgs <- start(range_cpgs)
+  rm(range_cpgs)
+  seqs_reads <- as.character(values(range_reads)$seq)
+  starts_reads <- start(ranges(range_reads))
+  overlap <- findOverlaps(range_reads,anno,ignore.strand=TRUE)
+  match_read_cpg <- as(overlap,"list")
+  overlap <- findOverlaps(anno,range_reads,ignore.strand=TRUE)
+  pdrs <- as.list(rep(NA,length(anno)))
+  rm(anno)
+  #' we classify each read into either discordant or concordant
+  classified_reads <- as.list(1:length(range_reads))
+  classified_reads <- lapply(classified_reads,classify.read,match_read_cpg,starts_cpgs,starts_reads,seqs_reads)
+  rm(match_read_cpg)
+  rm(starts_reads)
+  rm(seqs_reads)
+  rm(starts_cpgs)
+  values(range_reads) <- DataFrame(cbind('isDiscordant'=classified_reads))
+  rm(classified_reads)
+  logger.completed()
+
+  ######### PDR CALCULATION ###########
+  #' Starting from the classification of the reads, we now calculate the actual PDR
+  #' values for the CpG sites of interest
+  logger.start(paste('PDR',chromosome))
+  match_cpg_reads <- as(overlap,"list")
+  rm(overlap)
+  null <- lapply(match_cpg_reads,function(x){length(x)>0})
+  null <- unlist(null)
+  match_cpg_reads <- match_cpg_reads[null]
+  pdrs_actual <- lapply(match_cpg_reads,calculate.pdr.site,range_reads)
+  #' when we do not have a read that covers this site, we set the FDRP for this site to NA
+  pdrs[null] <- pdrs_actual
+  pdrs <- unlist(pdrs)
+  logger.completed()
+  logger.completed()
+  pdrs
 }
 
 #' anno.split
@@ -453,10 +621,10 @@ anno.split <- function(anno){
 #' This function calculates the FDRPs for all CpG sites in
 #' the annotation from the reads provided by the bam file.
 #'
-#' @param bam_file: 	bam-file of the sample to be analyzed
+#' @param bam.file: 	bath to the bam file to be analyzed
+#'				already aligned to a reference genome
 #' @param anno: 		CpG sites to be analyzed as a GRanges object
-#' @param path:			path to a folder where the FDRP CSV file should be written out
-#' @param output_name:	name of the output file
+#' @param log.path:			location of the log file
 #' @param cores:		number of cores available for the analysis
 #' @param window.size:	window size used to restrict the concordance/discordance classification of each read pair
 #' 						DEFAULT: 50 as the maximum distance
@@ -464,13 +632,17 @@ anno.split <- function(anno){
 #' @return FDRP scores for the given annotation.
 #'
 #' @author Michael Scherer
+#'
+#' @import RnBeads
+#' @import doParallel
+#' @import parallel
 #' @export
-calculate.fdrp <- function(bam_file,anno,path=getwd(),output_name,cores=1,window.size=get.option('WINDOW.SIZE')){
-  bam <- BamFile(bam_file)
-  if(!file.exists(file.path(path,'log'))){
-    dir.create(file.path(path,'log'))
+calculate.fdrp <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=get.option('WINDOW.SIZE')){
+  bam <- BamFile(bam.file)
+  if(!file.exists(file.path(log.path,'log'))){
+    dir.create(file.path(log.path,'log'))
   }
-  cl <- makeCluster(cores,outfile=file.path(path,'log',paste0('log_',output_name,'.log')))
+  cl <- makeCluster(cores,outfile=file.path(log.path,'log','log_FDRP.log'))
   registerDoParallel(cl)
   anno <- split(anno,seqnames(anno))
   anno <- anno[lengths(anno)>0]
@@ -481,8 +653,15 @@ calculate.fdrp <- function(bam_file,anno,path=getwd(),output_name,cores=1,window
     second <- anno.split(anno[[3]])
     anno <- c(anno[1:2],second,anno[4:23])
   }
-  fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrps.chromosome','compute.fdrp','compute.discordant','toCpGs','bam','convert','restrict','IHS.OPTIONS')) %dopar%{
-    calculate.fdrp.by.chromosome(bam,chromosome,type)
+  if(get.option('fdrp.type')=='FDRP'){
+    fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrp.by.chromosome','calculate.fdrp.site','compute.discordant','toCpGs','bam','convert','restrict')) %dopar%{
+      calculate.fdrp.by.chromosome(bam,chromosome)
+    }
+  }else{
+    fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrp.by.chromosome','calculate.fdrp.site','compute.discordant','toCpGs','bam','convert','restrict','set.option','get.option')) %dopar%{
+      set.option('fdrp.type'='qFDRP')
+      calculate.fdrp.by.chromosome(bam,chromosome)
+    }
   }
   stopCluster(cl)
   fdrps <- unlist(fdrps)
@@ -494,11 +673,10 @@ calculate.fdrp <- function(bam_file,anno,path=getwd(),output_name,cores=1,window
 #' This function calculates the qFDRP scores for the reads given in the bam files
 #' for the CpGs present in the annotation.
 #'
-#' @param bam_file:	bam file with the reads from a bisulfite sequencing technique
+#' @param bam.file: 	bath to the bam file to be analyzed
 #'				already aligned to a reference genome
 #' @param anno:	annotation as a GRanges object with the CpG sites to be analyzed
-#' @param path:			path to a folder where the FDRP CSV file should be written out
-#' @param output_name:	name of the output file
+#' @param log.path:			location of the log file
 #' @param cores:		number of cores available for the analysis
 #' @param window.size:	window size used to restrict the concordance/discordance classification of each read pair
 #' 						DEFAULT: 50 as the maximum distance
@@ -506,9 +684,90 @@ calculate.fdrp <- function(bam_file,anno,path=getwd(),output_name,cores=1,window
 #' @return qFDRP scores for the given annotation.
 #'
 #' @author Michael Scherer
+#'
 #' @export
-calculate.qfdrp <- function(bam_file,anno,path=getwd(),output_name,cores=1,window.size=get.option('WINDOW.SIZE')){
+calculate.qfdrp <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=get.option('WINDOW.SIZE')){
   set.option(fdrp.type='qFDRP')
-  qfdrp <- calculate.fdrp(bam_file,anno,path,output_name,cores,window.size)
+  qfdrp <- calculate.fdrp(bam.file,anno,log.path,cores)
   return(qfdrp)
+}
+
+#' calculate.pdr
+#'
+#'  This function calculates the PDRs for all analyzed CpG sites in
+#' the bam file of the corresponding sample
+#'
+#' @param bam.file: 	bath to the bam file to be analyzed
+#'				already aligned to a reference genome
+#' @param anno:	annotation as a GRanges object with the CpG sites to be analyzed
+#' @param log.path:		location of the log file
+#' @param cores:	number of cores available for the analysis
+#'
+#' @return PDR scores for the given annotation.
+#'
+#' @author Michael Scherer
+#'
+#' @import RnBeads
+#' @import doParallel
+#' @import parallel
+#' @export
+
+calculate.pdrs <- function(bam.file,anno,log.path=getwd(),cores=1){
+  bam <- BamFile(bam.file)
+  cl <- makeCluster(cores,outfile=file.path(log.path,'log','log_PDR.log'))
+  registerDoParallel(cl)
+  anno <- split(anno,seqnames(anno))
+  anno <- anno[lengths(anno)>0]
+  if(length(anno)>=22){
+    anno <- anno[1:22]
+    first <- split.anno(anno[[1]])
+    anno <- c(first,anno[2:22])
+    second <- split.anno(anno[[3]])
+    anno <- c(anno[1:2],second,anno[4:23])
+  }
+  pdrs <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.pdr.by.chromosome','calculate.pdr.site','classify.read','bam','convert')) %dopar%{
+    calculate.pdr.by.chromosome(bam,chromosome)
+  }
+  stopCluster(cl)
+  pdrs <- unlist(pdrs)
+  return(pdrs)
+}
+
+#' calculate.epipoly.line
+#'
+#' This functions computes epipolymorphim for a single line of methclone's output.
+#'
+#' @param line single line in methclone's output
+#' @return epipolymorphism for this region
+#'
+#' @author Michael Scherer
+#' @noRd
+calculate.epipoly.line <- function(line){
+  percentages <- as.numeric(line[15:30])
+  epipoly <- 1-(sum((percentages/100)^2))
+  epipoly <- round(epipoly,4)
+  epipoly
+}
+
+
+#' calculate.epipolymorphism
+#'
+#' This function calculates Epipolymorphism by calling the methclone software to compute epiallele frequencies and
+#' then uses the definition of epipolymorphism for the calculation.
+#'
+#' @param bam.file path to bam file containing the reads of the data set
+#' @param out.folder folder to store the temporary file produced by methclone
+#' @param out.name name of temporary file
+#'
+#' @import RnBeads
+#' @export
+calculate.epipolymorphism <- function(bam.file,out.folder=getwd(),out.name="methclone"){
+  run.methclone(bam.file=bam.file,out.folder=out.folder,out.name=out.name)
+  methclone.file <- file.path(out.folder,paste0(out.name,"_tmp.txt.gz"))
+  methclone.data <- read.table(methclone.file,sep='\t')
+  system(paste('rm',methclone.file))
+  output.frame <- data.frame(chromosome=methclone.data$chr,start=methclone.data$start,end=methclone.data$end,strand=methclone.data$strand)
+  values <- apply(methclone.data,1,calculate.epipoly.line)
+  output.frame <- data.frame(output.frame,Epipolymorphism=values)
+  return(output.frame)
 }

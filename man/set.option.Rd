@@ -18,7 +18,8 @@ FDRP.TYPE' <- 'FDRP')
 set.option
 Change global options for IHS score calculation}
 \usage{
-set.option(window.size, mapq.filter, max.reads, min.overlap, fdrp.type)
+set.option(window.size, mapq.filter, max.reads, min.overlap, fdrp.type,
+  coverage.threshold, methclone.methylation.diff)
 }
 \arguments{
 \item{window.size:}{Window around the CpG site of interest to consider in FDRP and qFDRP calculation, the higher the value, the more

@@ -4,18 +4,16 @@
 \alias{calculate.qfdrp}
 \title{calculate.qfdrp}
 \usage{
-calculate.qfdrp(bam_file, anno, path = getwd(), output_name, cores = 1,
+calculate.qfdrp(bam.file, anno, log.path = getwd(), cores = 1,
   window.size = get.option("WINDOW.SIZE"))
 }
 \arguments{
-\item{bam_file:}{bam file with the reads from a bisulfite sequencing technique
+\item{bam.file:}{bath to the bam file to be analyzed
 already aligned to a reference genome}
 
 \item{anno:}{annotation as a GRanges object with the CpG sites to be analyzed}
 
-\item{path:}{path to a folder where the FDRP CSV file should be written out}
-
-\item{output_name:}{name of the output file}
+\item{log.path:}{location of the log file}
 
 \item{cores:}{number of cores available for the analysis}
 

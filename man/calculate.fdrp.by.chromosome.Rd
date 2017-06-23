@@ -24,7 +24,7 @@ for the CpGs present in the annotation.
 }
 \details{
 :	This function is called by calculate.fdrps for each chromosome
-			separately and calls toCpG as well as compute.fdrp.
+			separately and calls toCpG as well as calculate.fdrp.site.
 }
 \author{
 Michael Scherer

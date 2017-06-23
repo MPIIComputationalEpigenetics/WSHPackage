@@ -4,17 +4,16 @@
 \alias{calculate.fdrp}
 \title{calculate.fdrp}
 \usage{
-calculate.fdrp(bam_file, anno, path = getwd(), output_name, cores = 1,
+calculate.fdrp(bam.file, anno, log.path = getwd(), cores = 1,
   window.size = get.option("WINDOW.SIZE"))
 }
 \arguments{
-\item{bam_file:}{bam-file of the sample to be analyzed}
+\item{bam.file:}{bath to the bam file to be analyzed
+already aligned to a reference genome}
 
 \item{anno:}{CpG sites to be analyzed as a GRanges object}
 
-\item{path:}{path to a folder where the FDRP CSV file should be written out}
-
-\item{output_name:}{name of the output file}
+\item{log.path:}{location of the log file}
 
 \item{cores:}{number of cores available for the analysis}
 

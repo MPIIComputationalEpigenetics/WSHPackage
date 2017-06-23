@@ -12,7 +12,7 @@ License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 Date: 2017-06-22
-Imports:
+Depends:
   RnBeads,
   GenomicAlignments,
   Rsamtools,
