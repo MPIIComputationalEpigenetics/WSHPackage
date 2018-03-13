@@ -14,6 +14,9 @@ calculate.epipolymorphism(bam.file, out.folder = getwd(),
 
 \item{out.name}{name of temporary file}
 }
+\value{
+a data frame containing the position in the reference genome and the Epipolymorphism scores
+}
 \description{
 This function calculates Epipolymorphism by calling the methclone software to compute epiallele frequencies and
 then uses the definition of epipolymorphism for the calculation.

@@ -8,16 +8,16 @@ calculate.qfdrp(bam.file, anno, log.path = getwd(), cores = 1,
   window.size = get.option("WINDOW.SIZE"))
 }
 \arguments{
-\item{bam.file:}{bath to the bam file to be analyzed
+\item{bam.file}{bath to the bam file to be analyzed
 already aligned to a reference genome}
 
-\item{anno:}{annotation as a GRanges object with the CpG sites to be analyzed}
+\item{anno}{annotation as a GRanges object with the CpG sites to be analyzed}
 
-\item{log.path:}{location of the log file}
+\item{log.path}{location of the log file}
 
-\item{cores:}{number of cores available for the analysis}
+\item{cores}{number of cores available for the analysis}
 
-\item{window.size:}{window size used to restrict the concordance/discordance classification of each read pair
+\item{window.size}{window size used to restrict the concordance/discordance classification of each read pair
 DEFAULT: 50 as the maximum distance}
 }
 \value{

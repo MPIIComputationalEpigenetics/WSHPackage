@@ -1,6 +1,6 @@
 #' create annotation
 #'
-#' This function creates a GRanges object from an input rnb.set object which then is inpute
+#' This function creates a GRanges object from an input rnb.set object which then is input
 #' for the IHS score calculation
 #'
 #' @param rnb.path path to an RnBSet object stored in disk
@@ -8,7 +8,13 @@
 #' @return GRanges object containing the CpG sites of interest
 #' @noRd
 create.annotation <- function(rnb.path){
-  rnb.set <- load.rnb.set(rnb.path)
+  if(inherits(rnb.path,"RnBSet")){
+    rnb.set <- rnb.path
+  }else if(file.exists(rnb.path)){
+    rnb.set <- load.rnb.set(rnb.path)
+  }else{
+    stop("Invalid value for rnb.set")
+  }
   anno <- annotation(rnb.set)
   coverage <- covg(rnb.set)
   mean_coverage <- rowMeans(coverage,na.rm=TRUE)
@@ -42,8 +48,10 @@ create.annotation <- function(rnb.path){
 #' @return FDRP scores for the CpG sites in the RnBSet with a higher coverage than COVERAGE.THRESHOLD
 #' @export
 rnb.calculate.fdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
+  logger.start("Computing FDRP from RnBSet object")
   anno <- create.annotation(rnb.set)
   fdrps <- calculate.fdrp(bam.path,anno,log.path=log.path,cores=cores)
+  logger.completed()
   return(fdrps)
 }
 
@@ -59,8 +67,10 @@ rnb.calculate.fdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
 #' @return qFDRP scores for the CpG sites in the RnBSet with a higher coverage than COVERAGE.THRESHOLD
 #' @export
 rnb.calculate.qfdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
+  logger.start("Computing qFDRP from RnBSet object")
   anno <- create.annotation(rnb.set)
   qfdrps <- calculate.qfdrp(bam.path,anno,log.path=log.path,cores=cores)
+  logger.completed()
   return(qfdrps)
 }
 
@@ -76,7 +86,30 @@ rnb.calculate.qfdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
 #' @return PDR scores for the CpG sites in the RnBSet with a higher coverage than COVERAGE.THRESHOLD
 #' @export
 rnb.calculate.pdr <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
+  logger.start("Computing PDR from RnBSet object")
   anno <- create.annotation(rnb.set)
   pdrs <- calculate.pdrs(bam.path,anno,log.path=log.path,cores=cores)
+  logger.completed()
   return(pdrs)
+}
+
+#' rnb.calculate.mhl
+#'
+#' This function calculates the MHL scores for a given RnBSet and a bam file containing the reads.
+#'
+#' @param rnb.set RnBSet object containing the CpG sites for which calculation should be conducted
+#' @param bam.path path to the bam file containing the reads
+#' @param roi.path path to a directory to which output can be added
+#'
+#' @return MHL scores for the CpG sites in the RnBSet with a higher coverage than COVERAGE.THRESHOLD
+#' @export
+rnb.calculate.mhl <- function(rnb.set,bam.path,roi.path=getwd()){
+  logger.start("Computing MHL from RnBSet object")
+  anno <- create.annotation(rnb.set)
+  roi.df <- data.frame(Chromosome=seqnames(anno),Start=start(anno),End=end(anno))
+  roi.location <- file.path(roi.path,"roi.bed")
+  write.table(roi.df,roi.location,sep="\t",quote=F,row.names=F)
+  mhl <- calculate.mhl(roi.location,bam.path)
+  logger.completed()
+  return(mhl)
 }

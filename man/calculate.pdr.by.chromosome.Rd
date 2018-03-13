@@ -7,13 +7,13 @@
 calculate.pdr.by.chromosome(bam, anno)
 }
 \arguments{
-\item{bam:}{bam file with the reads from a bisulfite sequencing technique
+\item{bam}{bam file with the reads from a bisulfite sequencing technique
 already aligned to a reference genome}
 
-\item{anno:}{annotation as a GRanges object with the CpG sites to be analyzed}
+\item{anno}{annotation as a GRanges object with the CpG sites to be analyzed}
 }
 \value{
-:		vector of pdr scores for the given CpG sites in anno
+vector of pdr scores for the given CpG sites in anno
 }
 \description{
 This function calculates the PDR scores for the reads given in the bam files

@@ -7,14 +7,14 @@
 calculate.pdrs(bam.file, anno, log.path = getwd(), cores = 1)
 }
 \arguments{
-\item{bam.file:}{bath to the bam file to be analyzed
+\item{bam.file}{bath to the bam file to be analyzed
 already aligned to a reference genome}
 
-\item{anno:}{annotation as a GRanges object with the CpG sites to be analyzed}
+\item{anno}{annotation as a GRanges object with the CpG sites to be analyzed}
 
-\item{log.path:}{location of the log file}
+\item{log.path}{location of the log file}
 
-\item{cores:}{number of cores available for the analysis}
+\item{cores}{number of cores available for the analysis}
 }
 \value{
 PDR scores for the given annotation.

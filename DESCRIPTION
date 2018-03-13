@@ -1,4 +1,4 @@
-Package: IHS
+Package: ISH
 Type: Package
 Title: R package for the calculation of the following Intra-Sample Heterogeneity Scores in Bisulfite Sequencing Data: FDRP, qFDRP, PDR, Epipolymorphism, Methylation Entropy and MHL
 Version: 0.1.0

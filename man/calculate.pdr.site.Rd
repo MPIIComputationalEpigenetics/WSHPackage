@@ -8,13 +8,13 @@ This function computes the PDR score for a given cpg site.}
 calculate.pdr.site(cpg, reads)
 }
 \arguments{
-\item{pos:}{index of the cpg site}
+\item{cpg}{index of the cpg site}
 
-\item{reads:}{GRanges object containing the reads needed for the calculation
+\item{reads}{GRanges object containing the reads needed for the calculation
 of the PDR, already converted into the custom representation}
 }
 \value{
-:			PDR score for the given CpG site
+PDR score for the given CpG site
 }
 \description{
 calculate.pdr.site

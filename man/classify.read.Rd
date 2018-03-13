@@ -8,19 +8,19 @@ This functions classifies a read into either discordant (TRUE) or concordant (FA
 classify.read(index, match_read_cpg, starts_cpgs, starts_reads, seqs_reads)
 }
 \arguments{
-\item{index:}{index of the read that should be converted to the custom representation}
+\item{index}{index of the read that should be converted to the custom representation}
 
-\item{match_read_cpg:}{list containing the mapping from the reads to the CpG sites covered by
+\item{match_read_cpg}{list containing the mapping from the reads to the CpG sites covered by
 the read}
 
-\item{starts_cpgs:}{vector of positions for the CpG sites}
+\item{starts_cpgs}{vector of positions for the CpG sites}
 
-\item{starts_reads:}{starting positions of the reads}
+\item{starts_reads}{starting positions of the reads}
 
-\item{seqs_reads:}{raw sequence of the read}
+\item{seqs_reads}{raw sequence of the read}
 }
 \value{
-:				representation of the read as a logical value, where TRUE represents a discordant
+representation of the read as a logical value, where TRUE represents a discordant
                 and FALSE a concordant read
 }
 \description{
@@ -28,7 +28,7 @@ classify.read
 This functions classifies a read into either discordant (TRUE) or concordant (FALSE).
 }
 \details{
-:				A read is classified as discordant, if the methylation levels found at all CpGs in the
+A read is classified as discordant, if the methylation levels found at all CpGs in the
                 read are heterogeneous. That means if there is at least one methylated and one
                 umethylated CpG, the read is discordant, otherwise concordant.
 }

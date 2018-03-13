@@ -8,26 +8,26 @@ This function decides for a given read pair if it is discordant or not.}
 compute.discordant(index, read1, read2, values, site)
 }
 \arguments{
-\item{index:}{index of the read pair}
+\item{index}{index of the read pair}
 
-\item{read1:}{vector of indeces for the query reads for the read pairs}
+\item{read1}{vector of indeces for the query reads for the read pairs}
 
-\item{read2:}{vector of indeces for the subject reads for the read pairs}
+\item{read2}{vector of indeces for the subject reads for the read pairs}
 
-\item{values:}{GRanges object containing the reads from which the read pairs
+\item{values}{GRanges object containing the reads from which the read pairs
 were calculated}
 
-\item{site:}{position of the CpG site of interest}
+\item{site}{position of the CpG site of interest}
 }
 \value{
-:			classification of the read pair as discordant or concordant
+classification of the read pair as discordant or concordant
 }
 \description{
 compute.discordant
 This function decides for a given read pair if it is discordant or not.
 }
 \details{
-:	The given read pair is only concordant, if all CpG sites that overlap between the
+The given read pair is only concordant, if all CpG sites that overlap between the
 				reads reflect the same methylation status. Otherwise the read pair is classified
 				as discordant.
 }

@@ -9,12 +9,12 @@ another.}
 restrict(positions, cpg)
 }
 \arguments{
-\item{positions:}{positions of the CpG sites in the read of interest}
+\item{positions}{positions of the CpG sites in the read of interest}
 
-\item{cpg:}{position of the CpG site of interest}
+\item{cpg}{position of the CpG site of interest}
 }
 \value{
-:				positions of the CpG sites that are at most WINDOW.SIZE away from one
+positions of the CpG sites that are at most WINDOW.SIZE away from one
 					another
 }
 \description{
