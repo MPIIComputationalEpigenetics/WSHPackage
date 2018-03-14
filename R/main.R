@@ -57,7 +57,17 @@ set.option <- function(window.size,
   if(!missing(coverage.threshold)) IHS.OPTIONS[['COVERAGE.THRESHOLD']] <- coverage.threshold
   if(!missing(methclone.methylation.diff)) IHS.OPTIONS[['METHCLONE.METHYLATION.DIFF']] <- methclone.methylation.diff
   if(!missing(perl.path)) IHS.OPTIONS[['PERL.PATH']] <- perl.path
-  if(!missing(samtools.path)) IHS.OPTIONS[['SAMTOOLS.PATH']] <- samtools.path
+  if(!missing(samtools.path)){
+    example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+    cmd <- paste0(samtools.path,"/samtools view -H ",example.bam)
+    tryCatch(output <- system(command = cmd,intern = T),error=function(e){
+      stop("Invalid value for samtools.path, please specify a directory with a working version of samtools")
+    })
+    if(substr(output[1],1,1)!="@"){
+      stop("Invalid value for samtools.path, please specify a directory with a working version of samtools")
+    }
+    IHS.OPTIONS[['SAMTOOLS.PATH']] <- samtools.path
+  }
   if(!missing(fdrp.type)){
     if(!(fdrp.type%in%c('FDRP','qFDRP'))) stop('Invalid Value for fdrp.type, either FDRP or qFDRP requred')
     IHS.OPTIONS[['FDRP.TYPE']] <- fdrp.type

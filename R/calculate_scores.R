@@ -785,16 +785,18 @@ calculate.entropy <- function(bam.file,out.folder=getwd(),out.name="methclone"){
 #'
 #' @return a data frame containing the position in the reference genome and the MHL scores
 #' @export
-calculate.mhl <- function(roi,bam.file,out.folder=getwd(),out.name="hapinfo.txt",bam.type="bismark"){
+calculate.mhl <- function(roi,bam.file,out.folder=getwd(),out.name="mhl.txt",bam.type="bismark"){
   logger.start("MHL calculation")
-  hapinfo.file <- run.haplotype.calculation(roi,bam.file,out.folder,out.name,bam.type)
+  hapinfo.file <- run.haplotype.calculation(roi,bam.file,out.folder,bam.type)
   mhl.file <- run.mhl.calculation(hapinfo.file,out.folder,out.name)
   mhl.data <- read.table(mhl.file,sep='\t',skip=1)
   anno.mhl <- as.character(mhl.data[,1])
   anno.mhl <- strsplit(anno.mhl,'[[:punct:]]')
   anno.mhl <- as.data.frame(anno.mhl)
-  mhl.scores <- as.numeric(mhl[,2])
+  anno.mhl <- t(anno.mhl)
+  mhl.scores <- as.numeric(mhl.data[,2])
   out.frame <- data.frame(chromosome=anno.mhl[,1],start=anno.mhl[,2],end=anno.mhl[,3],MHL=mhl.scores)
+  row.names(out.frame) <- 1:nrow(out.frame)
   logger.completed()
   return(out.frame)
 }
