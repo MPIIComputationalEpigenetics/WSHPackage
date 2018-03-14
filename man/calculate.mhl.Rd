@@ -4,7 +4,7 @@
 \alias{calculate.mhl}
 \title{calculate.mhl}
 \usage{
-calculate.mhl(roi, bam.file, out.folder = getwd(), out.name = "hapinfo.txt",
+calculate.mhl(roi, bam.file, out.folder = getwd(), out.name = "mhl.txt",
   bam.type = "bismark")
 }
 \arguments{

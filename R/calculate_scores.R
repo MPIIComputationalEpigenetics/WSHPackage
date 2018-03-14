@@ -71,7 +71,6 @@ toCpGs <- function(index,match_read_cpg,starts_cpgs,starts_reads,seqs_reads){
 #'                 umethylated CpG, the read is discordant, otherwise concordant.
 #'
 #' @author Michael Scherer
-#'
 #' @noRd
 classify.read <- function(index,match_read_cpg,starts_cpgs,starts_reads,seqs_reads){
   covered_cpgs <- match_read_cpg[[index]]
@@ -103,7 +102,6 @@ classify.read <- function(index,match_read_cpg,starts_cpgs,starts_reads,seqs_rea
 #'						another
 #'
 #' @author Michael Scherer
-#'
 #' @noRd
 restrict <- function(positions,cpg){
   #' We only restrict something, if the read is longer than 50 bp
@@ -202,7 +200,6 @@ restrict <- function(positions,cpg){
 #' 				as discordant.
 #'
 #' @author Michael Scherer
-#'
 #' @noRd
 compute.discordant <- function(index,read1,read2,values,site){
   #' this is the first read
@@ -262,7 +259,6 @@ compute.discordant <- function(index,read1,read2,values,site){
 #' 				the chormosome and calls compute.discordant for each pair of reads.
 #'
 #' @author Michael Scherer
-#'
 #' @export
 calculate.fdrp.site <- function(pos,cpg,reads,site){
   cpg <- cpg[[pos]]
@@ -315,7 +311,6 @@ calculate.fdrp.site <- function(pos,cpg,reads,site){
 #' @return PDR score for the given CpG site
 #'
 #' @author Michael Scherer
-#'
 #' @export
 calculate.pdr.site <- function(cpg,reads){
   #' we only consider the calculation if the cpg site is covered by more than 10 reads
@@ -354,7 +349,6 @@ calculate.pdr.site <- function(cpg,reads){
 #' @import Rsamtools
 #' @import GenomicAlignments
 #' @import rtracklayer
-#'
 #' @export
 calculate.fdrp.by.chromosome <- function(bam, anno){
   chromosome <- as.character(seqnames(anno))[1]
@@ -442,7 +436,6 @@ calculate.fdrp.by.chromosome <- function(bam, anno){
 #' @import Rsamtools
 #' @import GenomicAlignments
 #' @import rtracklayer
-#'
 #' @export
 calculate.pdr.by.chromosome <- function(bam, anno){
   chromosome <- as.character(seqnames(anno))[1]
@@ -608,7 +601,6 @@ calculate.fdrp.score <- function(bam.file,anno,log.path=getwd(),cores=1,window.s
 #' @return FDRP scores for the given annotation.
 #'
 #' @author Michael Scherer
-#'
 #' @export
 calculate.fdrp <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=get.option('WINDOW.SIZE')){
   set.option(fdrp.type='FDRP')
@@ -632,7 +624,6 @@ calculate.fdrp <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=ge
 #' @return qFDRP scores for the given annotation.
 #'
 #' @author Michael Scherer
-#'
 #' @export
 calculate.qfdrp <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=get.option('WINDOW.SIZE')){
   set.option(fdrp.type='qFDRP')

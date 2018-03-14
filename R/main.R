@@ -6,6 +6,7 @@
 ## G L O B A L S #######################################################################################################
 
 VALID.SCORES <- c("fdrp","qfdrp","pdr","epipolymorphism","entropy","mhl")
+WINDOWS.CAPABLE <- c("fdrp","qfdrp","pdr")
 
 IHS.OPTIONS <- new.env()
 assign('ALL',c('window.size','mapq.filter','max.reads','min.overlap','fdrp.type','coverage.threshold','methclone.methylation.diff','perl.path','samtools.path'),IHS.OPTIONS)
@@ -56,7 +57,16 @@ set.option <- function(window.size,
   if(!missing(min.overlap)) IHS.OPTIONS[['MIN.OVERLAP']] <- min.overlap
   if(!missing(coverage.threshold)) IHS.OPTIONS[['COVERAGE.THRESHOLD']] <- coverage.threshold
   if(!missing(methclone.methylation.diff)) IHS.OPTIONS[['METHCLONE.METHYLATION.DIFF']] <- methclone.methylation.diff
-  if(!missing(perl.path)) IHS.OPTIONS[['PERL.PATH']] <- perl.path
+  if(!missing(perl.path)){
+    cmd <- paste(perl.path,"--help")
+    tryCatch(output <- system(command = cmd,intern = T),error=function(e){
+      stop("Invalid value for perl.path, please specify the location of a working perl version")
+    })
+    if(is.null(output)){
+      stop("Invalid value for perl.path, please specify the location of a working perl version")
+    }
+    IHS.OPTIONS[['PERL.PATH']] <- perl.path
+  }
   if(!missing(samtools.path)){
     example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
     cmd <- paste0(samtools.path,"/samtools view -H ",example.bam)
@@ -128,9 +138,6 @@ get.option <- function(names){
 #' @author Michael Scherer
 #' @export
 ish.run.example <- function(score="qfdrp"){
-  if(!(score%in%VALID.SCORES)){
-    stop(paste("Invalid value for score, must be one of",VALID.SCORES))
-  }
   logger.start("ISH score example")
   example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package = "ISH")
   example.bam <- system.file(file.path("extData","small_example.bam"),package = "ISH")
@@ -152,9 +159,7 @@ ish.run.example <- function(score="qfdrp"){
 #' @author Michael Scherer
 #' @export
 compute.score.rnb <- function(bam.file,rnb.set,score){
-  if(!(score%in%VALID.SCORES)){
-    stop(paste("Invalid value for score, must be one of",VALID.SCORES))
-  }
+  ish.check.validity(score)
   if(!(file.exists(bam.file))){
     stop(paste("File",bam.file,"does not exist"))
   }
@@ -197,9 +202,7 @@ compute.score.rnb <- function(bam.file,rnb.set,score){
 #' @author Michael Scherer
 #' @export
 compute.score.GRanges <- function(bam.file,range,score){
-  if(!(score%in%VALID.SCORES)){
-    stop(paste("Invalid value for score, must be one of",VALID.SCORES))
-  }
+  ish.check.validity(score)
   if(!(file.exists(bam.file))){
     stop(paste("File",bam.file,"does not exist"))
   }
@@ -231,4 +234,53 @@ compute.score.GRanges <- function(bam.file,range,score){
     }
   }
   return(ret)
+}
+
+#' compute.score
+#' 
+#' Generic function to call, passes its arugments either to \code{\link{compute.score.rnb}} or
+#' \code{\link{compute.score.GRanges}}.
+#' 
+#' @param bam.file path to bam file containing the reads
+#' @param score The ISH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
+#'               \code{entropy} or \code{mhl}
+#' @param ... additional arugment. Either RnBSet, GRanges or empty (only for Epipolymorphism and Entropy)
+#'
+#' @return data frame containing the annotation and the computed ISH scores
+#' @author Michael Scherer
+#' @export
+compute.score <- function(bam.file,score="qfdrp",...){
+  ish.check.validity(score)
+  optlist <- list(...)
+  if(length(optlist)==0&!(score%in%c("epipolymorphism","entropy"))){
+    stop("Annotation inference only applicable for epipolymorphism and entropy. Please specify annotation.")
+  }
+  if(length(optlist)>1){
+    stop("Only single argument accepted. Either GRanges or RnBSet.")
+  }
+  if(inherits(optlist[[1]],"RnBSet")){
+    res <- compute.score.rnb(bam.file=bam.file,rnb.set=optlist[[1]],score=score)
+  }else if(inherits(optlist[[1]],"GRanges")){
+    res <- compute.score.GRanges(bam.file = bam.file,range=optlist[[1]],score=score)
+  }else{
+    stop("Invalid value for additional argument, needs to be GRanges or RnBSet")
+  }
+  return(res)
+}
+
+#' ish.check.validity
+#' 
+#' Checks if the score is compatible with the current setting, or if a non-valid score was specified.
+#' 
+#' @param score Score to be checked
+#' @author Michael Scherer
+#' @noRd
+ish.check.validity <- function(score){
+  if(!(score%in%VALID.SCORES)){
+    stop(paste("Invalid value for score, must be one of",VALID.SCORES))
+  }
+  sys.name <- Sys.info()['sysname']
+  if(sys.name=="Windows"&!(score%in%WINDOWS.CAPABLE)){
+    stop(paste("Cannot compute score",score,"on windows, only",paste(WINDOWS.CAPABLE,collapse = ", "),"are possible"))
+  }
 }
