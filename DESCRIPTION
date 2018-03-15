@@ -19,5 +19,6 @@ Depends:
   parallel,
   rtracklayer,
   doParallel,
-  RUnit
+  RUnit,
+  RnBeads.h38
 RoxygenNote: 6.0.1
