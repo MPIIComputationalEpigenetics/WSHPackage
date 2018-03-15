@@ -19,7 +19,7 @@ test.GRanges <- function(){
                                                                    2298915,2298921),end=c(2298361,2298554,2298732,2298743,2298787,
                                                                                           2298792,2298827,2298884,2298915,2298921)+1))
   qfdrp <- compute.score(example.bam,example.GRanges)
-  passes <- is.numeric(qfdrp)
+  passes <- is.numeric(qfdrp$qFDRP)
   checkTrue(passes)
 }
 

@@ -210,17 +210,20 @@ compute.score.GRanges <- function(bam.file,range,score){
     stop(paste("Invalid value for range, needs to be a GRanges object"))
   }
   if(score=="qfdrp"){
-    ret <- calculate.qfdrp(rnb.set,anno)
+    ret <- calculate.qfdrp(bam.file,range)
   }
   if(score=="fdrp"){
-    ret <- calculate.fdrp(rnb.set,anno)
+    ret <- calculate.fdrp(bam.file,range)
   }
   if(score=="pdr"){
-    ret <- rnb.calculate.pdr(rnb.set,bam.file)
+    ret <- rnb.calculate.pdr(bam.file,range)
   }
   if(score=="mhl"){
     # do transformation of GRanges to bed file
-    ret <- calculate.mhl(rnb.set,bam.file)
+    range.table <- data.frame(Chromosome=seqnames(range),Start=start(range),End=end(range))
+    mhl.file <- paste0(tempfile(pattern="ISH_"),".bed")
+    write.table(range.table,mhl.file,sep="\t",row.names = F)
+    ret <- calculate.mhl(mhl.file,bam.file)
   }
   if(score%in%c("epipolymorphism","entropy")){
     logger.warning("Epipolymorphism and Entropy do not take a RnBSet object as input. The annotation is computed from the bam file directly.")

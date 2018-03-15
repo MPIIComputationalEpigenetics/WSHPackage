@@ -12,4 +12,8 @@
 
 \maketitle
 
+\section{Introduction}
+
+This vignette desribes the functionalities included in the ISH R package. We describe the Intra-Sample Heterogeneity Scores FDRP, qFDRP, PDR, Epipolymorphism and Entropy. The package is able to compute each of those scores from bisulfite sequencing data.
+
 \end{document}
