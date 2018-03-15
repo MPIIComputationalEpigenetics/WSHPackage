@@ -1,0 +1,15 @@
+%\VignetteIndexEntry{R package for Intra-Sample Heterogeneity Scores}
+%\VignetteKeywords{methylation, RnBeads}
+
+\documentclass{article}
+
+\title{ISH - R package for Intra-Sample Heterogeneity Scores}
+
+\author{Michael Scherer}
+
+\begin{document}
+\SweaveOpts{concordance=TRUE}
+
+\maketitle
+
+\end{document}
