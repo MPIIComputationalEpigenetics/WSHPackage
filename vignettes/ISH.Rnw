@@ -3,7 +3,7 @@
 
 \documentclass{article}
 
-\usepackage{hyperref}
+\usepackage[colorlink=T,linkcolor=blue]{hyperref}
 
 \title{ISH - R package for Intra-Sample Heterogeneity Scores}
 
@@ -31,5 +31,37 @@ You can test if the installed version is functioning by employing one of the exa
 <<>>=
 qfdrp <- ish.run.example()
 @
+
+\section{Computing ISH scores}
+\subsection{FDRP, qFDRP and PDR}
+FDRP, qFDRP and PDR do not require any additional tools or scripts and can be computed directly from your \textit{bam} file. In this case, the \texttt{score} argument of the \texttt{compute.score} functions needs to be one of "fdrp", "qfdrp" or "pdr". You need to specify the CpG sites for which the scores should be computed in either of two forms: \texttt{GRanges} or \texttt{RnBSet}.
+\begin{enumerate}
+    \item[GRanges] This object should contain the positions of the CpGs for which analysis is to be conducted. The \texttt{GRanges} object should contain a single entry for each CpG and only have length 1 for each of the entries. Then you can either run \texttt{compute.score.GRanges} directly or call the generic function \texttt{compute.score}.
+<<>>=
+example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+example.GRanges <- GRanges(Rle(rep("chr2",10)),IRanges(start = c(2298361,2298554,2298732,2298743,2298787,2298792,2298827,2298884,
+                                                                 2298915,2298921),end=c(2298361,2298554,2298732,2298743,2298787,
+                                                                                        2298792,2298827,2298884,2298915,2298921)+1))
+pdr <- compute.score(bam.file=example.bam,example.GRanges,score="pdr")
+@
+    \item[RnBSet] In addition to \texttt{GRanges} objects, the ISH package support \texttt{RnBSet} objects as input. Here, the annotation is inferred from the object's annotation with the addition of only selecting those sites that have a coverage higher than \textit{coverage.threhold} in the \texttt{RnBSet} object. For more details on how to set options for analysis, see \autoref{option_setting}.
+<<>>=
+example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
+example.rnb.set <- load.rnb.set(example.rnb.set)
+set.option(coverage.threshold = 10)
+fdrp <- rnb.calculate.fdrp(example.rnb.set,example.bam)
+dim(qfdrp)
+dim(fdrp)
+@
+\end{enumerate}
+
+\subsection{MHL}
+In contrast to the scores above, MHL requires a working version of perl installed on your machine. For Linux, this should in general be \texttt{/usr/bin/perl}, which is per default set in this package. In case you are using MacOS (why we do not support Windows is argued in \autoref{windows_problems}), you first need to specify the option \textit{perl.path}. Furthermore, a working version of \texttt{samtools} is required by the programs that compute MHL.
+\section{Advanced Configuration}
+\subsection{Option settings}
+\label{option_setting}
+
+\subsection{Windows troubleshooting}
+\label{windows_problems}
 
 \end{document}

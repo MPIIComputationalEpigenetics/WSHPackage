@@ -16,11 +16,13 @@ create.annotation <- function(rnb.path){
     stop("Invalid value for rnb.set")
   }
   anno <- annotation(rnb.set)
-  coverage <- covg(rnb.set)
-  mean_coverage <- rowMeans(coverage,na.rm=TRUE)
-  rm(coverage)
-  high_enough <- mean_coverage >= get.option('coverage.threshold')
-  anno <- anno[high_enough,]
+  if(hasCovg("RnBiseqSet")){
+    coverage <- covg(rnb.set)
+    mean_coverage <- rowMeans(coverage,na.rm=TRUE)
+    rm(coverage)
+    high_enough <- mean_coverage >= get.option('coverage.threshold')
+    anno <- anno[high_enough,]
+  }
   if(all(c("chrX","chrY")%in%anno$Chromosome)){
     anno <- anno[anno$Chromosome!="chrX",]
     anno <- anno[anno$Chromosome!="chrY",]

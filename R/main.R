@@ -216,7 +216,7 @@ compute.score.GRanges <- function(bam.file,range,score){
     ret <- calculate.fdrp(bam.file,range)
   }
   if(score=="pdr"){
-    ret <- rnb.calculate.pdr(bam.file,range)
+    ret <- calculate.pdr(bam.file,range)
   }
   if(score=="mhl"){
     # do transformation of GRanges to bed file
