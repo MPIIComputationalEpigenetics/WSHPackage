@@ -1,4 +1,9 @@
 language: R
 sudo: false
 cache: packages
+r: bioc-release
+addons:
+  apt:
+    packages:
+    - perl
 warnings_are_errors: false
