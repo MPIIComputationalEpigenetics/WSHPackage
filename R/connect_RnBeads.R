@@ -16,7 +16,7 @@ create.annotation <- function(rnb.path){
     stop("Invalid value for rnb.set")
   }
   anno <- annotation(rnb.set)
-  if(hasCovg("RnBiseqSet")){
+  if(hasCovg(rnb.set)){
     coverage <- covg(rnb.set)
     mean_coverage <- rowMeans(coverage,na.rm=TRUE)
     rm(coverage)

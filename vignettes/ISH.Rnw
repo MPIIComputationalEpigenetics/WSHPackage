@@ -50,8 +50,10 @@ example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="
 example.rnb.set <- load.rnb.set(example.rnb.set)
 set.option(coverage.threshold = 10)
 fdrp <- rnb.calculate.fdrp(example.rnb.set,example.bam)
-dim(qfdrp)
-dim(fdrp)
+to.plot <- data.frame(qFDRP=qfdrp$qFDRP,FDRP=fdrp$FDRP)
+to.plot <- melt(to.plot)
+plot <- ggplot(to.plot,aes(x=value,y=..density..,color=variable))+geom_density()+theme_bw()
+plot
 @
 \end{enumerate}
 
