@@ -3,6 +3,8 @@
 
 \documentclass{article}
 
+\usepackage{hyperref}
+
 \title{ISH - R package for Intra-Sample Heterogeneity Scores}
 
 \author{Michael Scherer}
@@ -14,6 +16,20 @@
 
 \section{Introduction}
 
-This vignette desribes the functionalities included in the ISH R package. We describe the Intra-Sample Heterogeneity Scores FDRP, qFDRP, PDR, Epipolymorphism and Entropy. The package is able to compute each of those scores from bisulfite sequencing data.
+This vignette desribes the functionalities included in the ISH R package. We describe the Intra-Sample Heterogeneity Scores FDRP, qFDRP, PDR, Epipolymorphism and Entropy. The package is able to compute each of those scores from bisulfite sequencing data. Input should be a bam-file that contains reads that have been aligned to a reference genome. While PDR, qFDRP and FDRP are independent of the used mapping tools, Epipolymorphism and Entropy require the reads to be aligned with bismark. Here, we only discuss how to use the package. A detailed description of each of the scores can be found in the corresponding publications.
+
+\section{Installation}
+
+The package is available from GitHub and can be installed by the following command, given that the \href{https://cran.r-project.org/web/packages/devtools/index.html}{devtools} package is installed in your R installation:
+<<>>=
+devtools::install_github("schmic05/ISH_package")
+library(ISH)
+@
+
+You can test if the installed version is functioning by employing one of the examples in the package:
+
+<<>>=
+qfdrp <- ish.run.example()
+@
 
 \end{document}

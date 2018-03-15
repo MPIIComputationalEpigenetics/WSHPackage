@@ -4,15 +4,15 @@
 \alias{compute.score}
 \title{compute.score}
 \usage{
-compute.score(bam.file, score = "qfdrp", ...)
+compute.score(bam.file, ..., score = "qfdrp")
 }
 \arguments{
 \item{bam.file}{path to bam file containing the reads}
 
+\item{...}{additional arugment. Either RnBSet, GRanges or empty (only for Epipolymorphism and Entropy)}
+
 \item{score}{The ISH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
 \code{entropy} or \code{mhl}}
-
-\item{...}{additional arugment. Either RnBSet, GRanges or empty (only for Epipolymorphism and Entropy)}
 }
 \value{
 data frame containing the annotation and the computed ISH scores
