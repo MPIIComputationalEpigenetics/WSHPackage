@@ -3,7 +3,7 @@
 
 \documentclass{article}
 
-\usepackage[colorlink=T,linkcolor=blue]{hyperref}
+\usepackage[colorlinks=T,linkcolor=blue]{hyperref}
 
 \title{ISH - R package for Intra-Sample Heterogeneity Scores}
 
@@ -45,7 +45,7 @@ example.GRanges <- GRanges(Rle(rep("chr2",10)),IRanges(start = c(2298361,2298554
 pdr <- compute.score(bam.file=example.bam,example.GRanges,score="pdr")
 @
     \item[RnBSet] In addition to \texttt{GRanges} objects, the ISH package support \texttt{RnBSet} objects as input. Here, the annotation is inferred from the object's annotation with the addition of only selecting those sites that have a coverage higher than \textit{coverage.threhold} in the \texttt{RnBSet} object. For more details on how to set options for analysis, see \autoref{option_setting}.
-<<>>=
+<<fig=TRUE>>=
 example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
 example.rnb.set <- load.rnb.set(example.rnb.set)
 set.option(coverage.threshold = 10)
