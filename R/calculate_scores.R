@@ -652,9 +652,11 @@ calculate.qfdrp <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=g
 #' @import parallel
 #' @export
 calculate.pdr <- function(bam.file,anno,log.path=getwd(),cores=1){
-  logger.start("PDR calculation")
   output.frame <- data.frame(chromosome=seqnames(anno),start=start(anno),end=end(anno))
   bam <- BamFile(bam.file)
+  if(!file.exists(file.path(log.path,'log'))){
+    dir.create(file.path(log.path,'log'))
+  }
   cl <- makeCluster(cores,outfile=file.path(log.path,'log','log_PDR.log'))
   registerDoParallel(cl)
   anno <- split(anno,seqnames(anno))
