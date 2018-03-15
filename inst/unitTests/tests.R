@@ -2,13 +2,24 @@
 
 #' checks if the example is correctly working
 test.example <- function(){
-  qfdrp <- ish.run.example()
-  fdrp <- ish.run.example("fdrp")
-  pdr <- ish.run.example("pdr")
-  mhl <- ish.run.example("mhl")
-  epipoly <- ish.run.example("epipolymorphism")
-  entropy <- ish.run.example("entropy")
-  passes <- is.numeric(qfdrp)&is.numeric(fdrp)&is.numeric(pdr)&is.numeric(mhl)&is.numeric(epipoly)&is.numeric(entropy)
+  qfdrp <- ish.run.example()$qFDRP
+  fdrp <- ish.run.example("fdrp")$FDRP
+  pdr <- ish.run.example("pdr")$PDR
+  #mhl <- ish.run.example("mhl")
+  epipoly <- ish.run.example("epipolymorphism")$Epipolymorphism
+  entropy <- ish.run.example("entropy")$Entropy
+  passes <- is.numeric(qfdrp)&is.numeric(fdrp)&is.numeric(pdr)&is.numeric(epipoly)&is.numeric(entropy)
+  checkTrue(passes)
+}
+
+#' tests function to compute ISH scores from GRanges objects
+test.GRanges <- function(){
+  example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+  example.GRanges <- GRanges(Rle(rep("chr2",10)),IRanges(start = c(2298361,2298554,2298732,2298743,2298787,2298792,2298827,2298884,
+                                                                   2298915,2298921),end=c(2298361,2298554,2298732,2298743,2298787,
+                                                                                          2298792,2298827,2298884,2298915,2298921)+1))
+  qfdrp <- compute.score(example.bam,example.GRanges)
+  passes <- is.numeric(qfdrp)
   checkTrue(passes)
 }
 
@@ -18,6 +29,9 @@ execute.unit.test <- function(){
   logger.start("Unit testing")
     logger.start("Test example")
       test.example()
+    logger.completed()
+    logger.start("Test GRanges function")
+      test.GRanges()
     logger.completed()
   logger.completed()
 }

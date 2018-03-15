@@ -206,9 +206,6 @@ compute.score.GRanges <- function(bam.file,range,score){
   if(!(file.exists(bam.file))){
     stop(paste("File",bam.file,"does not exist"))
   }
-  if(!(file.exists(rnb.set))){
-    stop(paste("File",rnb.set,"does not exist"))
-  }
   if(!(inherits(range,"GRanges"))){
     stop(paste("Invalid value for range, needs to be a GRanges object"))
   }
@@ -237,19 +234,19 @@ compute.score.GRanges <- function(bam.file,range,score){
 }
 
 #' compute.score
-#' 
+#'
 #' Generic function to call, passes its arugments either to \code{\link{compute.score.rnb}} or
 #' \code{\link{compute.score.GRanges}}.
-#' 
+#'
 #' @param bam.file path to bam file containing the reads
+#' @param ... additional arugment. Either RnBSet, GRanges or empty (only for Epipolymorphism and Entropy)
 #' @param score The ISH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
 #'               \code{entropy} or \code{mhl}
-#' @param ... additional arugment. Either RnBSet, GRanges or empty (only for Epipolymorphism and Entropy)
 #'
 #' @return data frame containing the annotation and the computed ISH scores
 #' @author Michael Scherer
 #' @export
-compute.score <- function(bam.file,score="qfdrp",...){
+compute.score <- function(bam.file,...,score="qfdrp"){
   ish.check.validity(score)
   optlist <- list(...)
   if(length(optlist)==0&!(score%in%c("epipolymorphism","entropy"))){
@@ -269,9 +266,9 @@ compute.score <- function(bam.file,score="qfdrp",...){
 }
 
 #' ish.check.validity
-#' 
+#'
 #' Checks if the score is compatible with the current setting, or if a non-valid score was specified.
-#' 
+#'
 #' @param score Score to be checked
 #' @author Michael Scherer
 #' @noRd
