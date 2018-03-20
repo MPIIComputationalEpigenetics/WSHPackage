@@ -14,3 +14,4 @@ notifications:
 
 dist: trusty
 sudo: required
+install: travis_wait R CMD build
