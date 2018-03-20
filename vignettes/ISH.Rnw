@@ -28,7 +28,7 @@ library(ISH)
 
 You can test if the installed version is functioning by employing one of the examples in the package:
 
-<<>>=
+<<eval=FALSE>>=
 qfdrp <- ish.run.example()
 @
 
