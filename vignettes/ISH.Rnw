@@ -4,6 +4,7 @@
 \documentclass{article}
 
 \usepackage[colorlinks=T,linkcolor=blue]{hyperref}
+\usepackage{ebgaramond}
 
 \title{ISH - R package for Intra-Sample Heterogeneity Scores}
 
@@ -29,6 +30,7 @@ library(ISH)
 You can test if the installed version is functioning by employing one of the examples in the package:
 
 <<eval=FALSE>>=
+#' cannot be executed on all machines, since ~7GB of RAM are required
 qfdrp <- ish.run.example()
 @
 
@@ -52,13 +54,21 @@ set.option(coverage.threshold = 10)
 fdrp <- rnb.calculate.fdrp(example.rnb.set,example.bam)
 to.plot <- data.frame(qFDRP=qfdrp$qFDRP,FDRP=fdrp$FDRP)
 to.plot <- melt(to.plot)
-plot <- ggplot(to.plot,aes(x=value,y=..density..,color=variable))+geom_density()+theme_bw()
-plot
+#plot <- ggplot(to.plot,aes(x=value,y=..density..,color=variable))+geom_density()+theme_bw()
+#plot
 @
 \end{enumerate}
 
 \subsection{MHL}
 In contrast to the scores above, MHL requires a working version of perl installed on your machine. For Linux, this should in general be \texttt{/usr/bin/perl}, which is per default set in this package. In case you are using MacOS (why we do not support Windows is argued in \autoref{windows_problems}), you first need to specify the option \textit{perl.path}. Furthermore, a working version of \texttt{samtools} is required by the programs that compute MHL.
+<<eval=FALSE>>=
+set.option(perl.path = "/usr/bin/perl")
+set.option(samtools.path = "/usr/bin/samtools")
+mhl <- compute.score.GRanges(bam.file = example.bam, range = example.GRanges, score="mhl")
+@
+
+\subsection{Epipolymorphism and Entropy}
+Epipolymorphism and Entropy calculation depends on the methclone software (\url{https://code.google.com/archive/p/methclone/}) to compute epiallele counts and then uses R functions to compute the final scores. Thus, you need a working version of the software installed on your machine and need to tell the package where this is located. Similar to above, an option (\textit{methclone.path}) is resposible for the configuration.
 \section{Advanced Configuration}
 \subsection{Option settings}
 \label{option_setting}
