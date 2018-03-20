@@ -1,10 +1,85 @@
 %\VignetteIndexEntry{R package for Intra-Sample Heterogeneity Scores}
 %\VignetteKeywords{methylation, RnBeads}
 
-\documentclass{article}
+\documentclass[a4paper]{scrartcl}
 
-\usepackage[colorlinks=T,linkcolor=blue]{hyperref}
-\usepackage{ebgaramond}
+\usepackage[OT1]{fontenc}
+\usepackage{Sweave}
+\usepackage{color}
+\usepackage{vmargin}
+\usepackage[american]{babel}
+\usepackage{fancyhdr}
+\usepackage{listings}
+\usepackage{amsmath}
+
+\definecolor{darkblue}{rgb}{0.0,0.0,0.3}
+\usepackage[colorlinks,breaklinks,
+            linkcolor=darkblue,urlcolor=darkblue,
+            anchorcolor=darkblue,citecolor=darkblue]{hyperref}
+\usepackage{helvet}
+\setpapersize{A4}
+\setmargins{2.5cm}{2.0cm}% % left margin and upper margin
+           {16cm}{23cm}%   % text width and height
+           {60pt}{22pt}%   % Header height and margin
+           {0pt}{30pt}%    % \footheight (egal) und Fusszeilenabstand
+
+%%%%%%%%%%%%%%%%% Some style sttings %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\insertemptypage}[0]{\newpage \thispagestyle{empty} \vspace*{\fill}}
+
+% Layout
+\newcommand{\emphr}[1]{\textcolor{red}{\sffamily{\textbf{#1}}}}
+\newcommand{\itemr}[1]{\item \emphr{#1} \\}
+\newcommand{\ns}[1]{{\sffamily #1}}  % non-serif font
+\newcommand{\nsb}[1]{\ns{\textbf{#1}}}
+\newcommand{\nsbc}[1]{\nsb{\textcolor{blue}{#1}}}
+\newcommand{\nsbcr}[1]{\nsb{\textcolor{red}{#1}}}
+\newcommand{\cs}[1]{\texttt{#1}}    % code style
+
+\newcommand{\vocab}[1]{\textit{\ns{#1}}}
+\definecolor{grey}{rgb}{0.6,0.6,0.6}
+% Ueberschriften
+\renewcommand*{\sectfont }{\color{blue} \sffamily \bfseries}
+%\renewcommand{\thesection}{\Alph{section}}
+
+%neuer absatz
+\newcommand{\newpara}[0]{\vskip 10pt}
+
+%simple hyperrefs without having to type the link double
+\newcommand{\hrefs}[1]{\href{#1}{#1}}
+
+% Mathematik-Modus
+% Mengen
+\newcommand{\setN}[0]{\ensuremath{\mathds{N}}}
+\newcommand{\setR}[0]{\ensuremath{\mathds{R}}}
+\newcommand{\setZ}[0]{\ensuremath{\mathds{Z}}}
+\newcommand{\set}[1]{\left\{#1\right\}}
+%\newcommand{\tupt}[1]{\ensuremath{\langle}#1\ensuremath{\rangle}}
+
+% Statistics
+\newcommand{\pr}[0]{\ensuremath{\text{Pr}}}
+\newcommand{\E}[0]{\ensuremath{\text{E}}}
+\newcommand{\var}[0]{\ensuremath{\text{Var}}}
+\newcommand{\cov}[0]{\ensuremath{\text{Cov}}}
+\newcommand{\sd}[0]{\ensuremath{\text{sd}}}
+% Statistical Independence
+\newcommand\independent{\protect\mathpalette{\protect\independenT}{\perp}}
+\def\independenT#1#2{\mathrel{\setbox0\hbox{$#1#2$}%
+\copy0\kern-\wd0\mkern4mu\box0}}
+
+% Unsicher
+\newcommand{\chk}[0]{\textcolor{red}{(\textbf{???)}}}
+\newcommand{\chktxth}[1]{\textcolor{red}{(\textbf{???} #1 \textbf{???})}}
+\newcommand{\chkside}[0]{\marginpar{\textcolor{red}{(\textbf{???)}}}}
+\newcommand{\chktxt}[1]{\marginpar{\textcolor{red}{(\textbf{???} #1 \textbf{???})}}}
+
+\newcommand{\todo}[1]{\marginpar{\textcolor{red}{\textbf{TODO:}\newline #1}}}
+\newcommand{\todoh}[1]{\textcolor{red}{\textbf{TODO:} #1}}
+\newcommand{\todomark}[0]{\marginpar{\textcolor{red}{\textbf{TODO}}}}
+\newcommand{\chkm}[0]{\textcolor{red}{(\textbf{???)}} \marginpar{\textcolor{red}{\textbf{TODO}}}}
+\newcommand{\ph}[1]{\paragraph{} \textcolor{red}{[ #1 ]}} %placeholder
+
+\newcommand{\ra}[0]{$\rightarrow$}
+
 
 \title{ISH - R package for Intra-Sample Heterogeneity Scores}
 
@@ -15,20 +90,20 @@
 
 \maketitle
 
+\tableofcontents
+
 \section{Introduction}
 
-This vignette desribes the functionalities included in the ISH R package. We describe the Intra-Sample Heterogeneity Scores FDRP, qFDRP, PDR, Epipolymorphism and Entropy. The package is able to compute each of those scores from bisulfite sequencing data. Input should be a bam-file that contains reads that have been aligned to a reference genome. While PDR, qFDRP and FDRP are independent of the used mapping tools, Epipolymorphism and Entropy require the reads to be aligned with bismark. Here, we only discuss how to use the package. A detailed description of each of the scores can be found in the corresponding publications.
+This vignette desribes the functionalities included in the ISH R package. We describe the Intra-Sample Heterogeneity Scores FDRP, qFDRP, PDR, MHL, Epipolymorphism and Entropy. The package is able to compute each of those scores from bisulfite sequencing data. Input should be a \textit{bam} file that contains reads that have been aligned to a reference genome. While PDR, qFDRP and FDRP are independent of the employed mapping tool, Epipolymorphism and Entropy require the reads to be aligned with bismark. Here, we only discuss how to use the package. A detailed description of each of the scores can be found in the corresponding publications.
 
 \section{Installation}
 
-The package is available from GitHub and can be installed by the following command, given that the \href{https://cran.r-project.org/web/packages/devtools/index.html}{devtools} package is installed in your R installation:
+The package is available from GitHub and can be installed by the following command, given that the \href{https://cran.r-project.org/web/packages/devtools/index.html}{devtools} package is installed:
 <<>>=
-devtools::install_github("schmic05/ISH_package")
+#devtools::install_github("schmic05/ISH_package")
 library(ISH)
 @
-
 You can test if the installed version is functioning by employing one of the examples in the package:
-
 <<eval=FALSE>>=
 #' cannot be executed on all machines, since ~7GB of RAM are required
 qfdrp <- ish.run.example()
@@ -36,9 +111,9 @@ qfdrp <- ish.run.example()
 
 \section{Computing ISH scores}
 \subsection{FDRP, qFDRP and PDR}
-FDRP, qFDRP and PDR do not require any additional tools or scripts and can be computed directly from your \textit{bam} file. In this case, the \texttt{score} argument of the \texttt{compute.score} functions needs to be one of "fdrp", "qfdrp" or "pdr". You need to specify the CpG sites for which the scores should be computed in either of two forms: \texttt{GRanges} or \texttt{RnBSet}.
+FDRP, qFDRP and PDR do not require any additional tools or scripts and can be computed directly from your \textit{bam} file. In this case, the \texttt{score} argument of the \texttt{compute.score} function needs to be one of "fdrp", "qfdrp" or "pdr". You need to specify the CpG sites for which the scores should be computed in either of two forms: \texttt{GRanges} or \texttt{RnBSet}.
 \begin{enumerate}
-    \item[GRanges] This object should contain the positions of the CpGs for which analysis is to be conducted. The \texttt{GRanges} object should contain a single entry for each CpG and only have length 1 for each of the entries. Then you can either run \texttt{compute.score.GRanges} directly or call the generic function \texttt{compute.score}.
+    \item \texttt{GRanges:} This object should contain the positions of the CpGs for which analysis is to be conducted. The \texttt{GRanges} object should contain a single entry for each CpG and only have length 1 for each of the entries. Then you can either run \texttt{compute.score.GRanges} directly or call the generic function \texttt{compute.score}.
 <<>>=
 example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
 example.GRanges <- GRanges(Rle(rep("chr2",10)),IRanges(start = c(2298361,2298554,2298732,2298743,2298787,2298792,2298827,2298884,
@@ -46,15 +121,21 @@ example.GRanges <- GRanges(Rle(rep("chr2",10)),IRanges(start = c(2298361,2298554
                                                                                         2298792,2298827,2298884,2298915,2298921)+1))
 pdr <- compute.score(bam.file=example.bam,example.GRanges,score="pdr")
 @
-    \item[RnBSet] In addition to \texttt{GRanges} objects, the ISH package support \texttt{RnBSet} objects as input. Here, the annotation is inferred from the object's annotation with the addition of only selecting those sites that have a coverage higher than \textit{coverage.threhold} in the \texttt{RnBSet} object. For more details on how to set options for analysis, see \autoref{option_setting}.
-<<fig=TRUE>>=
+This returns a \textit{data.frame}, with the CpG positions (chromosome, start, end) in the first columns and the corresponding score in the last column.
+<<>>=
+dim(pdr)
+head(pdr)
+@
+
+    \item \textbf{RnBSet:} In addition to \texttt{GRanges} objects, the ISH package supports \texttt{RnBSet} objects as input. Here, the annotation is inferred from the object's annotation with the addition of only selecting those sites that have a coverage higher than \textit{coverage.threhold} in the \texttt{RnBSet} object. For more details on how to set options for analysis, see \autoref{option_setting}.
+<<fig=FALSE>>=
 example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
 example.rnb.set <- load.rnb.set(example.rnb.set)
 set.option(coverage.threshold = 10)
 fdrp <- rnb.calculate.fdrp(example.rnb.set,example.bam)
-to.plot <- data.frame(qFDRP=qfdrp$qFDRP,FDRP=fdrp$FDRP)
-to.plot <- melt(to.plot)
-#plot <- ggplot(to.plot,aes(x=value,y=..density..,color=variable))+geom_density()+theme_bw()
+#to.plot <- data.frame(qFDRP=qfdrp$qFDRP,FDRP=fdrp$FDRP)
+#to.plot <- melt(to.plot)
+#plot <- ggplot(to.plot,aes(x=value,y=..count..,color=variable,fill=variable))+geom_histogram()+facet_grid(variable~.)+theme_bw()
 #plot
 @
 \end{enumerate}
@@ -68,7 +149,15 @@ mhl <- compute.score.GRanges(bam.file = example.bam, range = example.GRanges, sc
 @
 
 \subsection{Epipolymorphism and Entropy}
-Epipolymorphism and Entropy calculation depends on the methclone software (\url{https://code.google.com/archive/p/methclone/}) to compute epiallele counts and then uses R functions to compute the final scores. Thus, you need a working version of the software installed on your machine and need to tell the package where this is located. Similar to above, an option (\textit{methclone.path}) is resposible for the configuration.
+Epipolymorphism and Entropy calculation depends on the methclone software (\url{https://code.google.com/archive/p/methclone/}) to compute epiallele counts and then uses R functions to compute the final scores. This package comes with an executable version of methclone and has been tested for several Debian versions. If you have trouble with the methclone version, please contact \href{mailto:mscherer@mpi-inf.mpg.de}{the author}. In contrast to the scores discussed above, Epipolymorphism and Entropy do not require an annotation object (either \texttt{GRanges} or \texttt{RnBSet}), since methclone operates as a black box and produces scores at positions directly inferred from the \textit{bam} file.
+<<fig=TRUE>>=
+epipoly <- compute.score(example.bam,score="epipolymorphism")
+entropy <- compute.score(example.bam,score="entropy")
+to.plot <- data.frame(Epipolymorphism=epipoly$Epipolymorphism,Entropy=entropy$Entropy)
+to.plot <- melt(to.plot)
+plot <- ggplot(to.plot,aes(x=value,y=..density..,color=variable))+geom_density()+theme_bw()
+plot
+@
 \section{Advanced Configuration}
 \subsection{Option settings}
 \label{option_setting}

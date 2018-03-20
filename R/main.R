@@ -226,7 +226,7 @@ compute.score.GRanges <- function(bam.file,range,score){
     ret <- calculate.mhl(mhl.file,bam.file)
   }
   if(score%in%c("epipolymorphism","entropy")){
-    logger.warning("Epipolymorphism and Entropy do not take a RnBSet object as input. The annotation is computed from the bam file directly.")
+    logger.warning("Epipolymorphism and Entropy do not take a GRanges object as input. The annotation is computed from the bam file directly.")
     if(score=="epipolymorphism"){
       ret <- calculate.epipolymorphism(bam.file)
     }else{
@@ -258,12 +258,22 @@ compute.score <- function(bam.file,...,score="qfdrp"){
   if(length(optlist)>1){
     stop("Only single argument accepted. Either GRanges or RnBSet.")
   }
-  if(inherits(optlist[[1]],"RnBSet")){
-    res <- compute.score.rnb(bam.file=bam.file,rnb.set=optlist[[1]],score=score)
-  }else if(inherits(optlist[[1]],"GRanges")){
-    res <- compute.score.GRanges(bam.file = bam.file,range=optlist[[1]],score=score)
+  if(length(optlist)==0){
+    if(score=="epipolymorphism"){
+      res <- calculate.epipolymorphism(bam.file)
+    }else if(score=="entropy"){
+      res <- calculate.entropy(bam.file)
+    }else{
+      stop("Invalid configuration. Please specify annotation.")
+    }
   }else{
-    stop("Invalid value for additional argument, needs to be GRanges or RnBSet")
+    if(inherits(optlist[[1]],"RnBSet")){
+      res <- compute.score.rnb(bam.file=bam.file,rnb.set=optlist[[1]],score=score)
+    }else if(inherits(optlist[[1]],"GRanges")){
+      res <- compute.score.GRanges(bam.file = bam.file,range=optlist[[1]],score=score)
+    }else{
+      stop("Invalid value for additional argument, needs to be GRanges or RnBSet")
+    }
   }
   return(res)
 }
