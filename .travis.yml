@@ -12,4 +12,5 @@ notifications:
     on_success: never
     on_failure: never
 
-dist: precise
+dist: trusty
+sudo: required
