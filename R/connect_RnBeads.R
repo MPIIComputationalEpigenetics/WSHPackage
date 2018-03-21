@@ -90,7 +90,7 @@ rnb.calculate.qfdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
 rnb.calculate.pdr <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
   logger.start("Computing PDR from RnBSet object")
   anno <- create.annotation(rnb.set)
-  pdrs <- calculate.pdrs(bam.path,anno,log.path=log.path,cores=cores)
+  pdrs <- calculate.pdr(bam.path,anno,log.path=log.path,cores=cores)
   logger.completed()
   return(pdrs)
 }
