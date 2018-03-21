@@ -161,8 +161,14 @@ plot
 \section{Advanced Configuration}
 \subsection{Option settings}
 \label{option_setting}
+The ISH package provides a bunch of options to set, which influence how the data is handled. This includes setting coverage thresholds on the annotation, distances between individual CpGs, or quality thresholds on reads to be considered in the calculation. For a detailed description of each of the options, see the R documentation.
+<<>>=
+?set.option
+@
+
 
 \subsection{Windows troubleshooting}
 \label{windows_problems}
+Using this package on a Windows OS, one can only compute qFDRP, FDRP and PDR, since they don't rely on external tools. In contrast to that, MHL depends on both perl and samtools, and since samtools is not easily installable on a Windows machine, we exclude this computation in case of a Windows OS. Epipolymorphism and Entropy depend on the methclone software, which is not supported for Windows and we thus also exclude this in case of Windows.
 
 \end{document}

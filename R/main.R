@@ -42,15 +42,15 @@ assign('SAMTOOLS.PATH',"/usr/bin",IHS.OPTIONS)
 #'
 #' @export
 #'
-set.option <- function(window.size,
-                       mapq.filter,
-                       max.reads,
-                       min.overlap,
-                       fdrp.type,
-                       coverage.threshold,
-                       methclone.methylation.diff,
-                       perl.path,
-                       samtools.path){
+set.option <- function(window.size=50,
+                       mapq.filter=35,
+                       max.reads=40,
+                       min.overlap=35,
+                       fdrp.type='FDRP',
+                       coverage.threshold=10,
+                       methclone.methylation.diff=0,
+                       perl.path="/usr/bin/perl",
+                       samtools.path="/usr/bin"){
   if(!missing(window.size)) IHS.OPTIONS[['WINDOW.SIZE']] <- window.size
   if(!missing(mapq.filter)) IHS.OPTIONS[['MAPQ.FILTER']] <- mapq.filter
   if(!missing(max.reads)) IHS.OPTIONS[['MAX.READS']] <- max.reads
