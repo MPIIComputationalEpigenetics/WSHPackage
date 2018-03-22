@@ -268,7 +268,7 @@ compute.score <- function(bam.file,...,score="qfdrp"){
       stop("Invalid configuration. Please specify annotation.")
     }
   }else{
-    if(inherits(optlist[[1]],"RnBSet")||file.exists(optlist[[1]])){
+    if(inherits(optlist[[1]],"RnBSet")||is.character(optlist[[1]])){
       res <- compute.score.rnb(bam.file=bam.file,rnb.set=optlist[[1]],score=score)
     }else if(inherits(optlist[[1]],"GRanges")){
       res <- compute.score.GRanges(bam.file = bam.file,range=optlist[[1]],score=score)
