@@ -8,7 +8,7 @@ Description: R package for the calculation of the following Intra-Sample Heterog
   Fraction of Discordant Read Pairs (FDRP), quantitative FDRP (qFDRP), 
   Proportion of Discordant Reads (PDR, Landau et.al. (2014), Cancer Cell ), Epipolymorphism (Landau et.al. (2012), Nature Genetics), 
   Methylation Entropy (Xie et.al. (2011), Nucleic Acids Research) and Methylation Haplotype Load (MHL, Guo et.al. (2017), Nature Genetics)
-License: What license is it under?
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Date: 2018-03-15

@@ -50,6 +50,22 @@ test.options <- function(){
   checkTrue(passes)
 }
 
+# test.option.influence <- function(){
+#   example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+#   example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
+#   fdrp.default <- rnb.calculate.fdrp(example.rnb.set,example.bam)
+#   set.option(coverage.threshold = 50)
+#   fdrp.new <- rnb.calculate.fdrp(example.rnb.set,example.bam)
+#   passes <- nrow(fdrp.default) != nrow(fdrp.new)
+#   set.option(coverage.threshold = 10)
+#   fdrp.new <- rnb.calculate.fdrp(example.rnb.set,example.bam)
+#   passes <- passes & (nrow(fdrp.default)==nrow(fdrp.new))
+#   set.option(mapq.filter = 0)
+#   fdrp.new <- rnb.calculate.fdrp(example.rnb.set,example.bam)
+#   passes <- passes & (any(fdrp.default$FDRP!=fdrp.new$FDRP))
+#   checkTrue(passes)
+# }
+
 #' main testing function
 execute.unit.test <- function(){
   require("RUnit")
@@ -67,6 +83,10 @@ execute.unit.test <- function(){
     logger.start("Test package options")
       test.options()
     logger.completed()
+    #' Only test locally
+    # logger.start("Test package option influence")
+    #   test.option.influence()
+    # logger.completed()
   logger.completed()
 }
 
