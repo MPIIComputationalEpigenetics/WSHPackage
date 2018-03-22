@@ -164,7 +164,7 @@ compute.score.rnb <- function(bam.file,rnb.set,score){
   if(!(file.exists(bam.file))){
     stop(paste("File",bam.file,"does not exist"))
   }
-  if(!(file.exists(rnb.set))){
+  if(!(file.exists(rnb.set)||inherits(rnb.set,"RnBSet"))){
     stop(paste("File",rnb.set,"does not exist"))
   }
   if(score=="qfdrp"){
@@ -268,7 +268,7 @@ compute.score <- function(bam.file,...,score="qfdrp"){
       stop("Invalid configuration. Please specify annotation.")
     }
   }else{
-    if(inherits(optlist[[1]],"RnBSet")){
+    if(inherits(optlist[[1]],"RnBSet")||file.exists(optlist[[1]])){
       res <- compute.score.rnb(bam.file=bam.file,rnb.set=optlist[[1]],score=score)
     }else if(inherits(optlist[[1]],"GRanges")){
       res <- compute.score.GRanges(bam.file = bam.file,range=optlist[[1]],score=score)
