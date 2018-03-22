@@ -139,9 +139,10 @@ get.option <- function(names){
 #' @export
 ish.run.example <- function(score="qfdrp"){
   logger.start("ISH score example")
-  example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package = "ISH")
+  example.GRanges <- system.file(file.path("extData","example_GRanges.RData"),package = "ISH")
+  load(example.GRanges)
   example.bam <- system.file(file.path("extData","small_example.bam"),package = "ISH")
-  score <- compute.score.rnb(example.bam,example.rnb.set,score)
+  score <- compute.score.GRanges(example.bam,example.GRanges,score)
   logger.completed()
   return(score)
 }

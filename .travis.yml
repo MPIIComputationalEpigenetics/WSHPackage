@@ -11,6 +11,3 @@ notifications:
   slack:
     on_success: never
     on_failure: never
-
-dist: precise
-sudo: required

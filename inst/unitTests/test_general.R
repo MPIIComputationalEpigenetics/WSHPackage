@@ -23,6 +23,16 @@ test.GRanges <- function(){
   checkTrue(passes)
 }
 
+#' tests function to compute ISH scores from RnBSet objects
+test.rnbSet <- function(){
+  example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+  example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
+  pdr <- compute.score(example.bam,example.rnb.set,score="pdr")
+  passes <- is.numeric(pdr$PDR)
+  checkTrue(passes)
+}
+
+
 #' main testing function
 execute.unit.test <- function(){
   require("RUnit")
@@ -33,6 +43,10 @@ execute.unit.test <- function(){
     logger.start("Test GRanges function")
       test.GRanges()
     logger.completed()
+    #' Only test locally
+    # logger.start("Test RnBSet function")
+    #   test.rnbSet()
+    # logger.completed()
   logger.completed()
 }
 
