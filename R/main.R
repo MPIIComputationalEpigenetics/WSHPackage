@@ -167,8 +167,10 @@ compute.score.rnb <- function(bam.file,rnb.set,score){
   if(!(file.exists(bam.file))){
     stop(paste("File",bam.file,"does not exist"))
   }
-  if(!(file.exists(rnb.set)||inherits(rnb.set,"RnBSet"))){
-    stop(paste("File",rnb.set,"does not exist"))
+  if(!(inherits(rnb.set,"RnBSet"))){
+    if(!(file.exists(rnb.set))){
+      stop(paste("File",rnb.set,"does not exist"))
+    }
   }
   if(score=="qfdrp"){
     ret <- rnb.calculate.qfdrp(rnb.set,bam.file)

@@ -121,13 +121,13 @@ example.GRanges <- GRanges(Rle(rep("chr2",10)),IRanges(start = c(2298361,2298554
 pdr <- compute.score(bam.file=example.bam,example.GRanges,score="pdr")
 @
 This returns a \textit{data.frame}, with the CpG positions (chromosome, start, end) in the first columns and the corresponding score in the last column.
-<<eval=FALSE>>=
+<<>>=
 dim(pdr)
 head(pdr)
 @
 
     \item \textbf{RnBSet:} In addition to \texttt{GRanges} objects, the ISH package supports \texttt{RnBSet} objects as input. Here, the annotation is inferred from the object's annotation with the addition of only selecting those sites that have a coverage higher than \textit{coverage.threhold} in the \texttt{RnBSet} object. For more details on how to set options for analysis, see \autoref{option_setting}.
-<<fig=FALSE,eval=FALSE>>=
+<<eval=FALSE>>=
 example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
 example.rnb.set <- load.rnb.set(example.rnb.set)
 set.option(coverage.threshold = 10)
@@ -139,13 +139,13 @@ fdrp <- rnb.calculate.fdrp(example.rnb.set,example.bam)
 In contrast to the scores above, MHL requires a working version of perl installed on your machine. For Linux, this should in general be \texttt{/usr/bin/perl}, which is per default set in this package. In case you are using MacOS (why we do not support Windows is argued in \autoref{windows_problems}), you first need to specify the option \textit{perl.path}. Furthermore, a working version of \texttt{samtools} is required by the programs that compute MHL.
 <<eval=FALSE>>=
 set.option(perl.path = "/usr/bin/perl")
-set.option(samtools.path = "/usr/bin/samtools")
-mhl <- compute.score.GRanges(bam.file = example.bam, range = example.GRanges, score="mhl")
+set.option(samtools.path = "/local/home/mscherer/home_nfs/work/mage/tools/samtools/bin/")
+mhl <- compute.score.rnb(bam.file = example.bam, rnb.set = example.rnb.set, score="mhl")
 @
 
 \subsection{Epipolymorphism and Entropy}
 Epipolymorphism and Entropy calculation depends on the methclone software (\url{https://code.google.com/archive/p/methclone/}) to compute epiallele counts and then uses R functions to compute the final scores. This package comes with an executable version of methclone and has been tested for several Debian versions. If you have trouble with the methclone version, please contact \href{mailto:mscherer@mpi-inf.mpg.de}{the author}. In contrast to the scores discussed above, Epipolymorphism and Entropy do not require an annotation object (either \texttt{GRanges} or \texttt{RnBSet}), since methclone operates as a black box and produces scores at positions directly inferred from the \textit{bam} file.
-<<fig=TRUE>>=
+<<fig=FALSE,eval=FALSE>>=
 epipoly <- compute.score(example.bam,score="epipolymorphism")
 entropy <- compute.score(example.bam,score="entropy")
 to.plot <- data.frame(Epipolymorphism=epipoly$Epipolymorphism,Entropy=entropy$Entropy)
