@@ -25,13 +25,30 @@ test.GRanges <- function(){
 
 #' tests function to compute ISH scores from RnBSet objects
 # test.rnbSet <- function(){
-#   example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
-#   example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
-#   pdr <- compute.score(example.bam,example.rnb.set,score="pdr")
-#   passes <- is.numeric(pdr$PDR)
-#   checkTrue(passes)
+#  example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+#  example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
+#  pdr <- compute.score(example.bam,example.rnb.set,score="pdr")
+#  passes <- is.numeric(pdr$PDR)
+#  checkTrue(passes)
 # }
 
+test.options <- function(){
+  names.new.options <- c("window.size","mapq.filter","max.reads","min.overlap","fdrp.type","coverage.threshold",
+                         "methclone.methylation.diff")
+  new.options <- c(window.size=42,mapq.filter=5,max.reads=10,min.overlap=59,fdrp.type="qFDRP",coverage.threshold=5,
+                   methclone.methylation.diff=0)
+  set.option(window.size=42,mapq.filter=5,max.reads=10,min.overlap=59,fdrp.type="qFDRP",coverage.threshold=5,
+             methclone.methylation.diff=0)
+  package.options <- get.option(names.new.options)
+  passes <- all(package.options == new.options)
+  tryCatch(set.option(perl.path="foo"),error=function(e){
+    passes <- FALSE
+  })
+  tryCatch(set.option(samtools.path="foo"),error=function(e){
+    passes <- FALSE
+  })
+  checkTrue(passes)
+}
 
 #' main testing function
 execute.unit.test <- function(){
@@ -47,6 +64,9 @@ execute.unit.test <- function(){
     # logger.start("Test RnBSet function")
     #   test.rnbSet()
     # logger.completed()
+    logger.start("Test package options")
+      test.options()
+    logger.completed()
   logger.completed()
 }
 

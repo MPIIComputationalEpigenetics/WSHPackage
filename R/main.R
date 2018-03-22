@@ -51,6 +51,9 @@ set.option <- function(window.size=50,
                        methclone.methylation.diff=0,
                        perl.path="/usr/bin/perl",
                        samtools.path="/usr/bin"){
+  if(length(window.size)!=1){
+    stop("Please specify the options one by one, not as a vector or list.")
+  }
   if(!missing(window.size)) IHS.OPTIONS[['WINDOW.SIZE']] <- window.size
   if(!missing(mapq.filter)) IHS.OPTIONS[['MAPQ.FILTER']] <- mapq.filter
   if(!missing(max.reads)) IHS.OPTIONS[['MAX.READS']] <- max.reads
