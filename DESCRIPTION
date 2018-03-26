@@ -6,7 +6,7 @@ Author: Michael Scherer
 Maintainer: Michael Scherer <mscherer@mpi-inf.mpg.de>
 Description: R package for the calculation of the following Intra-Sample Heterogeneity Scores in Bisulfite Sequencing Data: 
   Fraction of Discordant Read Pairs (FDRP), quantitative FDRP (qFDRP), 
-  Proportion of Discordant Reads (PDR, Landau et.al. (2014), Cancer Cell ), Epipolymorphism (Landau et.al. (2012), Nature Genetics), 
+  Proportion of Discordant Reads (PDR, Landau et.al. (2014), Cancer Cell ), Epipolymorphism (Landan et.al. (2012), Nature Genetics), 
   Methylation Entropy (Xie et.al. (2011), Nucleic Acids Research) and Methylation Haplotype Load (MHL, Guo et.al. (2017), Nature Genetics)
 License: GPL-3
 Encoding: UTF-8
