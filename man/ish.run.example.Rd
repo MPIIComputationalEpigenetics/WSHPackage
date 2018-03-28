@@ -16,6 +16,11 @@ A data frame containing the annotation and the corresponding score
 \description{
 Returns the scores for a small example data set of size 50kb
 }
+\examples{
+\donttest{
+ish.run.example("pdr")
+}
+}
 \author{
 Michael Scherer
 }

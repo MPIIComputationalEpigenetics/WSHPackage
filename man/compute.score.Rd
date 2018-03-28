@@ -21,6 +21,15 @@ data frame containing the annotation and the computed ISH scores
 Generic function to call, passes its arugments either to \code{\link{compute.score.rnb}} or
 \code{\link{compute.score.GRanges}}.
 }
+\examples{
+\donttest{
+load(system.file(file.path("extData","example_GRanges.RData"),package="ISH"))
+example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
+example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+fdrp <- compute.score(bam.file=example.bam,example.GRanges,score="fdrp")
+qfdrp <- compute.score(bam.file=example.bam,example.rnb.set,score="qfdrp")
+}
+}
 \author{
 Michael Scherer
 }

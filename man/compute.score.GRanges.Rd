@@ -4,7 +4,7 @@
 \alias{compute.score.GRanges}
 \title{compute.score.GRanges}
 \usage{
-compute.score.GRanges(bam.file, range, score)
+compute.score.GRanges(bam.file, range, score = "qfdrp")
 }
 \arguments{
 \item{bam.file}{path to bam file containing the reads}
@@ -19,6 +19,13 @@ data frame containing the annotation and the computed ISH scores
 }
 \description{
 Main function to compute ISH scores based on a input GRanges object and a bam file containing the reads.
+}
+\examples{
+\donttest{
+load(system.file(file.path("extData","example_GRanges.RData"),package="ISH"))
+example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+fdrp <- compute.score.GRanges(bam.file=example.bam,range=example.GRanges)
+}
 }
 \author{
 Michael Scherer

@@ -24,7 +24,7 @@ assign('SAMTOOLS.PATH',"/usr/bin",IHS.OPTIONS)
 
 #' set.option
 #'
-#' Change global options for IHS score calculation
+#' Change global options for ISH score calculation
 #'
 #' @param window.size Window around the CpG site of interest to consider in FDRP and qFDRP calculation, the higher the value, the more
 #' likely it is to find heterogeneity
@@ -41,7 +41,13 @@ assign('SAMTOOLS.PATH',"/usr/bin",IHS.OPTIONS)
 #' @param samtools.path path to the directory where samtools is located in your machine
 #'
 #' @export
-#'
+#' @author Michael Scherer
+#' @examples
+#' \donttest{
+#' get.option("coverage.threshold")
+#' set.option(coverage.threshold=42)
+#' get.option("coverage.threshold")
+#' }
 set.option <- function(window.size=50,
                        mapq.filter=35,
                        max.reads=40,
@@ -93,6 +99,13 @@ set.option <- function(window.size=50,
 #' @param names string or character vector containing the names of the options to be printed
 #'
 #' @return the option for the specified option
+#' @author Michael Scherer
+#' @examples
+#' \donttest{
+#' get.option("coverage.threshold")
+#' set.option(coverage.threshold=42)
+#' get.option("coverage.threshold")
+#' }
 #' @export
 get.option <- function(names){
   if(!all(names %in% IHS.OPTIONS[['ALL']])){
@@ -139,6 +152,10 @@ get.option <- function(names){
 #' @return A data frame containing the annotation and the corresponding score
 #'
 #' @author Michael Scherer
+#' @examples
+#' \donttest{
+#' ish.run.example("pdr")
+#' }
 #' @export
 ish.run.example <- function(score="qfdrp"){
   logger.start("ISH score example")
@@ -161,8 +178,14 @@ ish.run.example <- function(score="qfdrp"){
 #'
 #' @return data frame containing the annotation and the computed ISH scores
 #' @author Michael Scherer
+#' @examples
+#' \donttest{
+#' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
+#' example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+#' fdrp <- compute.score.rnb(bam.file=example.bam,rnb.set=example.rnb.set)
+#' }
 #' @export
-compute.score.rnb <- function(bam.file,rnb.set,score){
+compute.score.rnb <- function(bam.file,rnb.set,score="qfdrp"){
   ish.check.validity(score)
   if(!(file.exists(bam.file))){
     stop(paste("File",bam.file,"does not exist"))
@@ -206,8 +229,14 @@ compute.score.rnb <- function(bam.file,rnb.set,score){
 #'
 #' @return data frame containing the annotation and the computed ISH scores
 #' @author Michael Scherer
+#' @examples
+#' \donttest{
+#' load(system.file(file.path("extData","example_GRanges.RData"),package="ISH"))
+#' example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+#' fdrp <- compute.score.GRanges(bam.file=example.bam,range=example.GRanges)
+#' }
 #' @export
-compute.score.GRanges <- function(bam.file,range,score){
+compute.score.GRanges <- function(bam.file,range,score="qfdrp"){
   ish.check.validity(score)
   if(!(file.exists(bam.file))){
     stop(paste("File",bam.file,"does not exist"))
@@ -254,6 +283,14 @@ compute.score.GRanges <- function(bam.file,range,score){
 #'
 #' @return data frame containing the annotation and the computed ISH scores
 #' @author Michael Scherer
+#' @examples
+#' \donttest{
+#' load(system.file(file.path("extData","example_GRanges.RData"),package="ISH"))
+#' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
+#' example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+#' fdrp <- compute.score(bam.file=example.bam,example.GRanges,score="fdrp")
+#' qfdrp <- compute.score(bam.file=example.bam,example.rnb.set,score="qfdrp")
+#' }
 #' @export
 compute.score <- function(bam.file,...,score="qfdrp"){
   ish.check.validity(score)

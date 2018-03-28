@@ -48,6 +48,14 @@ create.annotation <- function(rnb.path){
 #' @param cores cores available for the analysis
 #'
 #' @return FDRP scores for the CpG sites in the RnBSet with a higher coverage than COVERAGE.THRESHOLD
+#'
+#' @author Michael Scherer
+#' @examples
+#' \donttest{
+#' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
+#' example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+#' fdrp <- rnb.calculate.fdrp(rnb.set=example.rnb.set,bam.path=example.bam)
+#' }
 #' @export
 rnb.calculate.fdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
   logger.start("Computing FDRP from RnBSet object")
@@ -67,6 +75,15 @@ rnb.calculate.fdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
 #' @param cores cores available for the analysis
 #'
 #' @return qFDRP scores for the CpG sites in the RnBSet with a higher coverage than COVERAGE.THRESHOLD
+#'
+#' @author Michael Scherer
+#' @examples
+#' \donttest{
+#' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
+#' example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+#' fdrp <- rnb.calculate.qfdrp(rnb.set=example.rnb.set,bam.path=example.bam)
+#' }
+
 #' @export
 rnb.calculate.qfdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
   logger.start("Computing qFDRP from RnBSet object")
@@ -86,6 +103,15 @@ rnb.calculate.qfdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
 #' @param cores cores available for the analysis
 #'
 #' @return PDR scores for the CpG sites in the RnBSet with a higher coverage than COVERAGE.THRESHOLD
+#'
+#' @author Michael Scherer
+#' @examples
+#' \donttest{
+#' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
+#' example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+#' fdrp <- rnb.calculate.pdr(rnb.set=example.rnb.set,bam.path=example.bam)
+#' }
+
 #' @export
 rnb.calculate.pdr <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
   logger.start("Computing PDR from RnBSet object")
@@ -104,6 +130,7 @@ rnb.calculate.pdr <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
 #' @param roi.path path to a directory to which output can be added
 #'
 #' @return MHL scores for the CpG sites in the RnBSet with a higher coverage than COVERAGE.THRESHOLD
+#'
 #' @export
 rnb.calculate.mhl <- function(rnb.set,bam.path,roi.path=getwd()){
   logger.start("Computing MHL from RnBSet object")

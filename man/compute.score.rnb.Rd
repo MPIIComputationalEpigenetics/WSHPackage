@@ -4,7 +4,7 @@
 \alias{compute.score.rnb}
 \title{compute.score.rnb}
 \usage{
-compute.score.rnb(bam.file, rnb.set, score)
+compute.score.rnb(bam.file, rnb.set, score = "qfdrp")
 }
 \arguments{
 \item{bam.file}{path to bam file containing the reads}
@@ -19,6 +19,13 @@ data frame containing the annotation and the computed ISH scores
 }
 \description{
 Main function to compute ISH scores based on a input RnBSet and a bam file containing the reads.
+}
+\examples{
+\donttest{
+example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
+example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+fdrp <- compute.score.rnb(bam.file=example.bam,rnb.set=example.rnb.set)
+}
 }
 \author{
 Michael Scherer

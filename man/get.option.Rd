@@ -17,3 +17,13 @@ the option for the specified option
 get.option
 Print the value of the global option
 }
+\examples{
+\donttest{
+get.option("coverage.threshold")
+set.option(coverage.threshold=42)
+get.option("coverage.threshold")
+}
+}
+\author{
+Michael Scherer
+}

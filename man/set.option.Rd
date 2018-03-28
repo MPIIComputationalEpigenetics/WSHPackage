@@ -33,5 +33,15 @@ that have a methylation difference higher than this value in the methclone packa
 \item{samtools.path}{path to the directory where samtools is located in your machine}
 }
 \description{
-Change global options for IHS score calculation
+Change global options for ISH score calculation
+}
+\examples{
+\donttest{
+get.option("coverage.threshold")
+set.option(coverage.threshold=42)
+get.option("coverage.threshold")
+}
+}
+\author{
+Michael Scherer
 }
