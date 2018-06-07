@@ -604,6 +604,7 @@ calculate.fdrp.score <- function(bam.file,anno,log.path=getwd(),cores=1,window.s
 #' @export
 calculate.fdrp <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=get.option('WINDOW.SIZE')){
   set.option(fdrp.type='FDRP')
+  anno <- remove.sex.chromosomes(anno)
   qfdrp <- calculate.fdrp.score(bam.file,anno,log.path,cores)
   return(qfdrp)
 }
@@ -627,6 +628,7 @@ calculate.fdrp <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=ge
 #' @export
 calculate.qfdrp <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=get.option('WINDOW.SIZE')){
   set.option(fdrp.type='qFDRP')
+  anno <- remove.sex.chromosomes(anno)
   qfdrp <- calculate.fdrp.score(bam.file,anno,log.path,cores)
   colnames(qfdrp)[ncol(qfdrp)] <- "qFDRP"
   return(qfdrp)
@@ -653,6 +655,7 @@ calculate.qfdrp <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=g
 #' @export
 calculate.pdr <- function(bam.file,anno,log.path=getwd(),cores=1){
   logger.start("PDR calculation")
+  anno <- remove.sex.chromosomes(anno)
   output.frame <- data.frame(chromosome=seqnames(anno),start=start(anno),end=end(anno))
   bam <- BamFile(bam.file)
   if(!file.exists(file.path(log.path,'log'))){

@@ -337,3 +337,25 @@ ish.check.validity <- function(score){
     stop(paste("Cannot compute score",score,"on windows, only",paste(WINDOWS.CAPABLE,collapse = ", "),"are possible"))
   }
 }
+
+#' remove.sex.chromosomes
+#'
+#' Removes sex chromosomes from the annotation, since we do not compute scores for those chromosomes, only for the autosomes.
+#'
+#' @param annotation Annotation (RnBSet or GRanges), for which sex chromosomes are to be removed.
+#'
+#' @return The annotation without the sex chromosomes
+#' @noRd
+remove.sex.chromosomes <- function(annotation){
+  logger.start("Removing Sex chromosomes")
+  if(inherits(annotation,"RnBSet")){
+    annotation <- rnb.execute.sex.removal(rnb.set=annotation)
+  }else if(inherits(annotation,"GRanges")){
+    keep <- !(as.character(seqnames(annotation)) %in% c("chrX","X","chrY","y"))
+    annotation <- annotation[keep]
+  }else{
+    stop("Invalid value for annotation.")
+  }
+  logger.completed()
+  return(annotation)
+}
