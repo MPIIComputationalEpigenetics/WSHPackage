@@ -1,7 +1,7 @@
 Package: ISH
 Type: Package
 Title: R package for the calculation of the following Intra-Sample Heterogeneity Scores in Bisulfite Sequencing Data: FDRP, qFDRP, PDR, Epipolymorphism, Methylation Entropy and MHL
-Version: 0.1.0
+Version: 0.1.1
 Author: Michael Scherer
 Maintainer: Michael Scherer <mscherer@mpi-inf.mpg.de>
 Description: R package for the calculation of the following Intra-Sample Heterogeneity Scores in Bisulfite Sequencing Data: 
@@ -11,7 +11,7 @@ Description: R package for the calculation of the following Intra-Sample Heterog
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Date: 2018-03-15
+Date: 2018-11-07
 Depends:
   RnBeads,
   GenomicAlignments,
@@ -21,4 +21,4 @@ Depends:
   doParallel,
   RUnit,
   RnBeads.hg38
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0

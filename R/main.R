@@ -359,3 +359,52 @@ remove.sex.chromosomes <- function(annotation){
   logger.completed()
   return(annotation)
 }
+
+#' create.genomebrowser.track
+#'
+#' Converts the output of compute.score und compute.score.GRanges into genome browser tracks, that
+#' can be directly imported into e.g. UCSC Genome Browser.
+#'
+#' @param score.output The output as generated through compute.score or compute.score.GRanges: a
+#'        data.frame with chromosome positions and the score values for those positions.
+#' @param sample.name The name of the sample to be added to the file.
+#' @param store.path The path to which the file is to be stored.
+#' @param bin.width Width of bins in bp to aggregate the scores. If NULL, the scores are stored
+#'        as single CpGs.
+#' @author Michael Scherer
+#' @export
+create.genomebrowser.track <- function(score.output, sample.name="Sample", store.path=getwd(),bin.width=5000){
+	if(!is.data.frame(score.output)){
+		stop("Invalid value for score.output, needs to be a data.frame")
+	}
+	if(!all((c("chromosome","start","end") %in% colnames(score.output)))){
+		stop("Neccessary column names not available")
+	}
+  score <- colnames(score.output)[4]
+	if(!is.null(bin.width)){
+		agg <- lapply(unique(score.output$chromosome),function(chr){
+			start.chr <- min(score.output$start[score.output$chromosome %in% chr])
+			end.chr <- max(score.output$end[score.output$chromosome %in% chr])
+			cbind(as.character(chr),seq(start.chr,end.chr-bin.width,by=bin.width),seq(start.chr+bin.width,end.chr,by=bin.width))
+		})
+		agg.frame <- c()
+		for(chr in agg){
+		  agg.frame <- rbind(agg.frame,chr)
+		}
+		agg.ranges <- GRanges(Rle(agg.frame[,1]),IRanges(start=as.numeric(agg.frame[,2]),as.numeric(agg.frame[,3])))
+		score.anno <- GRanges(Rle(score.output$chromosome),IRanges(start=score.output$start,end=score.output$end))
+		op <- findOverlaps(score.anno,agg.ranges)
+		agg.score <- aggregate(score.output[queryHits(op),4],by=list(subjectHits(op)),mean,na.rm=T)
+		score.output <- data.frame(agg.frame[unique(subjectHits(op)),],agg.score$x)
+	}
+	final.output <- data.frame(score.output[,1:3],paste0("'",round(as.numeric(score.output[,4])*100),"%'"),round(as.numeric(score.output[,4])*100,2))
+	final.output <- apply(final.output,c(1,2),as.character)
+	to.write <- c()
+	for(i in 1:nrow(final.output)){
+	  to.write <- c(to.write,paste(paste(c(final.output[i,]),collapse = " ")))
+	}
+	to.write <- c(paste0("browser position ",final.output[1,1],":",final.output[2,1],"-",final.output[3,1]),
+					paste0("track type=bed name=\"",sample.name," description=\"",score, " scores in ", bin.width," tiles\" useScore=1"),
+					to.write)
+	writeLines(to.write,file.path(store.path,paste0(sample.name,"_",score,".bed")))
+}

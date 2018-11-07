@@ -565,15 +565,15 @@ calculate.fdrp.score <- function(bam.file,anno,log.path=getwd(),cores=1,window.s
     anno <- c(anno[1:2],second,anno[4:23])
   }
   if(get.option('fdrp.type')=='FDRP'){
-    logger.start("FDRP caluclation")
-    fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrp.by.chromosome','calculate.fdrp.site','compute.discordant','toCpGs','convert','restrict','set.option','get.option')) %dopar%{
+    logger.start("FDRP calculation")
+    fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrp.by.chromosome','calculate.fdrp.site','compute.discordant','toCpGs','convert','restrict','set.option','get.option','IHS.OPTIONS')) %dopar%{
       set.option('fdrp.type'='FDRP')
       calculate.fdrp.by.chromosome(bam,chromosome)
     }
     logger.completed()
   }else{
-    logger.start("qFDRP caluclation")
-    fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrp.by.chromosome','calculate.fdrp.site','compute.discordant','toCpGs','convert','restrict','set.option','get.option')) %dopar%{
+    logger.start("qFDRP calculation")
+    fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrp.by.chromosome','calculate.fdrp.site','compute.discordant','toCpGs','convert','restrict','set.option','get.option','IHS.OPTIONS')) %dopar%{
       set.option('fdrp.type'='qFDRP')
       calculate.fdrp.by.chromosome(bam,chromosome)
     }
@@ -672,7 +672,7 @@ calculate.pdr <- function(bam.file,anno,log.path=getwd(),cores=1){
     second <- split.anno(anno[[3]])
     anno <- c(anno[1:2],second,anno[4:23])
   }
-  pdrs <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.pdr.by.chromosome','calculate.pdr.site','classify.read','convert')) %dopar%{
+  pdrs <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.pdr.by.chromosome','calculate.pdr.site','classify.read','convert','IHS.OPTIONS')) %dopar%{
     calculate.pdr.by.chromosome(bam,chromosome)
   }
   stopCluster(cl)
