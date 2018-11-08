@@ -403,7 +403,7 @@ create.genomebrowser.track <- function(score.output, sample.name="Sample", store
 	for(i in 1:nrow(final.output)){
 	  to.write <- c(to.write,paste(paste(c(final.output[i,]),collapse = " ")))
 	}
-	to.write <- c(paste0("browser position ",final.output[1,1],":",final.output[2,1],"-",final.output[3,1]),
+	to.write <- c(paste0("browser position ",final.output[1,1],":",final.output[1,2],"-",final.output[1,3]),
 					paste0("track type=bed name=\"",sample.name," description=\"",score, " scores in ", bin.width," tiles\" useScore=1"),
 					to.write)
 	writeLines(to.write,file.path(store.path,paste0(sample.name,"_",score,".bed")))

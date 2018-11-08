@@ -169,4 +169,12 @@ The ISH package provides a bunch of options to set, which influence how the data
 \label{windows_problems}
 Using this package on a Windows OS, one can only compute qFDRP, FDRP and PDR, since they don't rely on external tools. In contrast to that, MHL depends on both \texttt{perl} and \texttt{samtools}, and since \texttt{samtools} is not easily installable on a Windows machine, we exclude this computation in case of a Windows. Epipolymorphism and Entropy depend on the methclone software, which is not supported for Windows and we thus also exclude this.
 
+\subsection{Exporting results to Genome Browser tracks}
+We provide a function to export the results as a Genome Browser track. ISH scores can either be aggregated over genomic bins (parameters \texttt{bin.width}, default = 5kb) or exported in single CpG format. The package will output a BED file with the information on the output generated with \texttt{compute.score}.
+<<>>=
+create.genomebrowser.track(score.output=qfdrp,bin.width=7500,sample.name="mySample")
+bed.file <- readLines("mySample_qFDRP.bed")
+head(bed.file)
+@
+
 \end{document}

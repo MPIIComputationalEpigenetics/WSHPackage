@@ -32,13 +32,13 @@ test.GRanges <- function(){
 }
 
 #' tests function to compute ISH scores from RnBSet objects
- test.rnbSet <- function(){
-  example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
-  example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
-  pdr <- compute.score(example.bam,example.rnb.set,score="pdr")
-  passes <- is.numeric(pdr$PDR)
-  checkTrue(passes)
- }
+ # test.rnbSet <- function(){
+ #  example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+ #  example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
+ #  pdr <- compute.score(example.bam,example.rnb.set,score="pdr")
+ #  passes <- is.numeric(pdr$PDR)
+ #  checkTrue(passes)
+ # }
 
 test.options <- function(){
   names.new.options <- c("window.size","mapq.filter","max.reads","min.overlap","fdrp.type","coverage.threshold",
@@ -58,21 +58,21 @@ test.options <- function(){
   checkTrue(passes)
 }
 
- test.option.influence <- function(){
-   example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
-   example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
-   fdrp.default <- rnb.calculate.fdrp(example.rnb.set,example.bam)
-   set.option(coverage.threshold = 50)
-   fdrp.new <- rnb.calculate.fdrp(example.rnb.set,example.bam)
-   passes <- nrow(fdrp.default) != nrow(fdrp.new)
-   set.option(coverage.threshold = 10)
-   fdrp.new <- rnb.calculate.fdrp(example.rnb.set,example.bam)
-   passes <- passes & (nrow(fdrp.default)==nrow(fdrp.new))
-   set.option(mapq.filter = 0)
-   fdrp.new <- rnb.calculate.fdrp(example.rnb.set,example.bam)
-   passes <- passes & (any(fdrp.default$FDRP!=fdrp.new$FDRP))
-   checkTrue(passes)
- }
+ # test.option.influence <- function(){
+ #   example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+ #   example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
+ #   fdrp.default <- rnb.calculate.fdrp(example.rnb.set,example.bam)
+ #   set.option(coverage.threshold = 50)
+ #   fdrp.new <- rnb.calculate.fdrp(example.rnb.set,example.bam)
+ #   passes <- nrow(fdrp.default) != nrow(fdrp.new)
+ #   set.option(coverage.threshold = 10)
+ #   fdrp.new <- rnb.calculate.fdrp(example.rnb.set,example.bam)
+ #   passes <- passes & (nrow(fdrp.default)==nrow(fdrp.new))
+ #   set.option(mapq.filter = 0)
+ #   fdrp.new <- rnb.calculate.fdrp(example.rnb.set,example.bam)
+ #   passes <- passes & (any(fdrp.default$FDRP!=fdrp.new$FDRP))
+ #   checkTrue(passes)
+ # }
 
 test.genomebrowser <- function(){
 	qfdrp <- ish.run.example()
@@ -95,16 +95,16 @@ execute.unit.test <- function(){
       test.GRanges()
     logger.completed()
     #' Only test locally
-    logger.start("Test RnBSet function")
-      test.rnbSet()
-    logger.completed()
+    # logger.start("Test RnBSet function")
+    #   test.rnbSet()
+    # logger.completed()
     logger.start("Test package options")
       test.options()
     logger.completed()
     #' Only test locally
-    logger.start("Test package option influence")
-       test.option.influence()
-    logger.completed()
+    # logger.start("Test package option influence")
+    #    test.option.influence()
+    # logger.completed()
 	logger.start("Test Genome Browser conversion")
 		test.genomebrowser()
 	logger.completed()
