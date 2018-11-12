@@ -11,5 +11,3 @@ notifications:
   slack:
     on_success: never
     on_failure: never
-before_script:
-  - BiocManager::install(version='release', ask=FALSE)	
