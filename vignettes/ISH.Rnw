@@ -99,12 +99,12 @@ This vignette desribes the functionalities included in the ISH R package. We des
 \section{Installation}
 
 The package is available from GitHub and can be installed by the following command, given that the \href{https://cran.r-project.org/web/packages/devtools/index.html}{devtools} package is installed:
-<<>>=
+<<eval=FALSE>>=
 devtools::install_github("schmic05/ISH_package")
-library(ISH)
 @
 You can test if the installed version is functioning by employing one of the examples in the package:
 <<>>=
+library(ISH)
 qfdrp <- ish.run.example()
 @
 
