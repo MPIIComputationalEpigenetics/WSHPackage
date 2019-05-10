@@ -33,7 +33,7 @@ that have a methylation difference higher than this value in the methclone packa
 \item{samtools.path}{path to the directory where samtools is located in your machine}
 }
 \description{
-Change global options for ISH score calculation
+Change global options for WSH score calculation
 }
 \examples{
 \donttest{

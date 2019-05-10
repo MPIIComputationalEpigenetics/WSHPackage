@@ -3,3 +3,8 @@
 .RData
 .Ruserdata
 *.Rproj
+*.aux
+*.log
+*.out
+*.tex
+log/

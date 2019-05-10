@@ -1,1 +1,1 @@
-BiocGenerics:::testPackage("ISH")
+BiocGenerics:::testPackage("WSH")

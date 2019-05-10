@@ -31,4 +31,5 @@ This function is called by calculate.fdrps.chromosome each CpG present on
 }
 \author{
 Michael Scherer
+we actually calculate the FDRP as frac{#discordant read pairs}{#all read pairs}
 }

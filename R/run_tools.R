@@ -10,7 +10,7 @@
 #' @export
 run.methclone <- function(bam.file,out.folder=getwd(),out.name="methclone"){
   logger.start("Computing epialleles with methclone software")
-  location <- system.file(file.path("bin","methclone"),package="ISH")
+  location <- system.file(file.path("bin","methclone"),package="WSH")
   out.file <- file.path(out.folder,paste0(out.name,"_tmp.txt.gz"))
   cmd <- paste(location,bam.file,bam.file,out.file,out.name,get.option('methclone.methylation.diff'),get.option('window.size'),get.option('coverage.threshold'))
   logger.info(paste("Executing:",cmd))
@@ -35,7 +35,7 @@ run.haplotype.calculation <- function(roi,bam.file,out.folder=getwd(),out.name="
   logger.start("Computing haplotypes with perl scripts (might take several hours/days)")
   Sys.setenv(PATH=paste0(get.option("samtools.path"),":",Sys.getenv("PATH")))
   perl.location <- get.option('perl.path')
-  script.location <- system.file(file.path("scripts","mergedBam2hapInfo_RRBS_v1.0.pl"),package = "ISH")
+  script.location <- system.file(file.path("scripts","mergedBam2hapInfo_RRBS_v1.0.pl"),package = "WSH")
   out.file <- file.path(out.folder,out.name)
   cmd <- paste(perl.location,script.location,roi,bam.file,bam.type,roi,">",out.file)
   logger.info(paste("Exceuting:",cmd))
@@ -57,7 +57,7 @@ run.haplotype.calculation <- function(roi,bam.file,out.folder=getwd(),out.name="
 run.mhl.calculation <- function(hapinfo.file,out.folder=getwd(),out.name="mhl.txt"){
   logger.start("Computing MHL score from haplotype information")
   perl.location <- get.option('perl.path')
-  script.location <- system.file(file.path("scripts","hapinfo2mhl.pl"),package = "ISH")
+  script.location <- system.file(file.path("scripts","hapinfo2mhl.pl"),package = "WSH")
   out.file <- file.path(out.folder,out.name)
   temp.info <- file.path(out.folder,"info_list.txt")
   writeLines(hapinfo.file,temp.info)

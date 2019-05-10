@@ -1,17 +1,17 @@
-Package: ISH
+Package: WSH
 Type: Package
-Title: R package for the calculation of the following Intra-Sample Heterogeneity Scores in Bisulfite Sequencing Data: FDRP, qFDRP, PDR, Epipolymorphism, Methylation Entropy and MHL
-Version: 0.1.1
+Title: R package for the calculation of the following Within-Sample Heterogeneity Scores in Bisulfite Sequencing Data: FDRP, qFDRP, PDR, Epipolymorphism, Methylation Entropy and MHL
+Version: 0.1.2
 Author: Michael Scherer
 Maintainer: Michael Scherer <mscherer@mpi-inf.mpg.de>
-Description: R package for the calculation of the following Intra-Sample Heterogeneity Scores in Bisulfite Sequencing Data: 
+Description: R package for the calculation of the following Within-Sample Heterogeneity Scores in Bisulfite Sequencing Data: 
   Fraction of Discordant Read Pairs (FDRP), quantitative FDRP (qFDRP), 
   Proportion of Discordant Reads (PDR, Landau et.al. (2014), Cancer Cell ), Epipolymorphism (Landan et.al. (2012), Nature Genetics), 
   Methylation Entropy (Xie et.al. (2011), Nucleic Acids Research) and Methylation Haplotype Load (MHL, Guo et.al. (2017), Nature Genetics)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Date: 2018-11-07
+Date: 2019-05-10
 Depends:
   RnBeads,
   GenomicAlignments,
@@ -21,4 +21,4 @@ Depends:
   doParallel,
   RUnit,
   RnBeads.hg38
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1

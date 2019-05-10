@@ -11,11 +11,11 @@ compute.score(bam.file, ..., score = "qfdrp")
 
 \item{...}{additional arugment. Either RnBSet, GRanges or empty (only for Epipolymorphism and Entropy)}
 
-\item{score}{The ISH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
+\item{score}{The WSH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
 \code{entropy} or \code{mhl}}
 }
 \value{
-data frame containing the annotation and the computed ISH scores
+data frame containing the annotation and the computed WSH scores
 }
 \description{
 Generic function to call, passes its arugments either to \code{\link{compute.score.rnb}} or
@@ -23,9 +23,9 @@ Generic function to call, passes its arugments either to \code{\link{compute.sco
 }
 \examples{
 \donttest{
-load(system.file(file.path("extData","example_GRanges.RData"),package="ISH"))
-example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
-example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+load(system.file(file.path("extData","example_GRanges.RData"),package="WSH"))
+example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="WSH")
+example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
 fdrp <- compute.score(bam.file=example.bam,example.GRanges,score="fdrp")
 qfdrp <- compute.score(bam.file=example.bam,example.rnb.set,score="qfdrp")
 }

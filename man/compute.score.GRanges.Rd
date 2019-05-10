@@ -11,19 +11,19 @@ compute.score.GRanges(bam.file, range, score = "qfdrp")
 
 \item{range}{GRanges object containing the annotation}
 
-\item{score}{The ISH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
+\item{score}{The WSH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
 \code{entropy} or \code{mhl}}
 }
 \value{
-data frame containing the annotation and the computed ISH scores
+data frame containing the annotation and the computed WSH scores
 }
 \description{
-Main function to compute ISH scores based on a input GRanges object and a bam file containing the reads.
+Main function to compute WSH scores based on a input GRanges object and a bam file containing the reads.
 }
 \examples{
 \donttest{
-load(system.file(file.path("extData","example_GRanges.RData"),package="ISH"))
-example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+load(system.file(file.path("extData","example_GRanges.RData"),package="WSH"))
+example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
 fdrp <- compute.score.GRanges(bam.file=example.bam,range=example.GRanges)
 }
 }

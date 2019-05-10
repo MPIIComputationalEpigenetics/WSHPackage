@@ -24,7 +24,7 @@ assign('SAMTOOLS.PATH',"/usr/bin",IHS.OPTIONS)
 
 #' set.option
 #'
-#' Change global options for ISH score calculation
+#' Change global options for WSH score calculation
 #'
 #' @param window.size Window around the CpG site of interest to consider in FDRP and qFDRP calculation, the higher the value, the more
 #' likely it is to find heterogeneity
@@ -77,7 +77,7 @@ set.option <- function(window.size=50,
     IHS.OPTIONS[['PERL.PATH']] <- perl.path
   }
   if(!missing(samtools.path)){
-    example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+    example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
     cmd <- paste0(samtools.path,"/samtools view -H ",example.bam)
     tryCatch(output <- system(command = cmd,intern = T),error=function(e){
       stop("Invalid value for samtools.path, please specify a directory with a working version of samtools")
@@ -142,11 +142,11 @@ get.option <- function(names){
   return(ret[names])
 }
 
-#' ish.run.example
+#' wsh.run.example
 #'
 #' Returns the scores for a small example data set of size 50kb
 #'
-#' @param score The ISH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
+#' @param score The WSH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
 #'               \code{entropy} or \code{mhl}
 #'
 #' @return A data frame containing the annotation and the corresponding score
@@ -154,14 +154,14 @@ get.option <- function(names){
 #' @author Michael Scherer
 #' @examples
 #' \donttest{
-#' ish.run.example("pdr")
+#' wsh.run.example("pdr")
 #' }
 #' @export
-ish.run.example <- function(score="qfdrp"){
-  logger.start("ISH score example")
-  example.GRanges <- system.file(file.path("extData","example_GRanges.RData"),package = "ISH")
+wsh.run.example <- function(score="qfdrp"){
+  logger.start("WSH score example")
+  example.GRanges <- system.file(file.path("extData","example_GRanges.RData"),package = "WSH")
   load(example.GRanges)
-  example.bam <- system.file(file.path("extData","small_example.bam"),package = "ISH")
+  example.bam <- system.file(file.path("extData","small_example.bam"),package = "WSH")
   score <- compute.score.GRanges(example.bam,example.GRanges,score)
   logger.completed()
   return(score)
@@ -169,24 +169,24 @@ ish.run.example <- function(score="qfdrp"){
 
 #' compute.score.rnb
 #'
-#' Main function to compute ISH scores based on a input RnBSet and a bam file containing the reads.
+#' Main function to compute WSH scores based on a input RnBSet and a bam file containing the reads.
 #'
 #' @param bam.file path to bam file containing the reads
 #' @param rnb.set path to RnBSet contaning methylation, coverage and sample meta information
-#' @param score The ISH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
+#' @param score The WSH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
 #'               \code{entropy} or \code{mhl}
 #'
-#' @return data frame containing the annotation and the computed ISH scores
+#' @return data frame containing the annotation and the computed WSH scores
 #' @author Michael Scherer
 #' @examples
 #' \donttest{
-#' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
-#' example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+#' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="WSH")
+#' example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
 #' fdrp <- compute.score.rnb(bam.file=example.bam,rnb.set=example.rnb.set)
 #' }
 #' @export
 compute.score.rnb <- function(bam.file,rnb.set,score="qfdrp"){
-  ish.check.validity(score)
+  wsh.check.validity(score)
   if(!(file.exists(bam.file))){
     stop(paste("File",bam.file,"does not exist"))
   }
@@ -220,24 +220,24 @@ compute.score.rnb <- function(bam.file,rnb.set,score="qfdrp"){
 
 #' compute.score.GRanges
 #'
-#' Main function to compute ISH scores based on a input GRanges object and a bam file containing the reads.
+#' Main function to compute WSH scores based on a input GRanges object and a bam file containing the reads.
 #'
 #' @param bam.file path to bam file containing the reads
 #' @param range GRanges object containing the annotation
-#' @param score The ISH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
+#' @param score The WSH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
 #'               \code{entropy} or \code{mhl}
 #'
-#' @return data frame containing the annotation and the computed ISH scores
+#' @return data frame containing the annotation and the computed WSH scores
 #' @author Michael Scherer
 #' @examples
 #' \donttest{
-#' load(system.file(file.path("extData","example_GRanges.RData"),package="ISH"))
-#' example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+#' load(system.file(file.path("extData","example_GRanges.RData"),package="WSH"))
+#' example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
 #' fdrp <- compute.score.GRanges(bam.file=example.bam,range=example.GRanges)
 #' }
 #' @export
 compute.score.GRanges <- function(bam.file,range,score="qfdrp"){
-  ish.check.validity(score)
+  wsh.check.validity(score)
   if(!(file.exists(bam.file))){
     stop(paste("File",bam.file,"does not exist"))
   }
@@ -256,7 +256,7 @@ compute.score.GRanges <- function(bam.file,range,score="qfdrp"){
   if(score=="mhl"){
     # do transformation of GRanges to bed file
     range.table <- data.frame(Chromosome=seqnames(range),Start=start(range),End=end(range))
-    mhl.file <- paste0(tempfile(pattern="ISH_"),".bed")
+    mhl.file <- paste0(tempfile(pattern="WSH_"),".bed")
     write.table(range.table,mhl.file,sep="\t",row.names = F)
     ret <- calculate.mhl(mhl.file,bam.file)
   }
@@ -278,22 +278,22 @@ compute.score.GRanges <- function(bam.file,range,score="qfdrp"){
 #'
 #' @param bam.file path to bam file containing the reads
 #' @param ... additional arugment. Either RnBSet, GRanges or empty (only for Epipolymorphism and Entropy)
-#' @param score The ISH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
+#' @param score The WSH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
 #'               \code{entropy} or \code{mhl}
 #'
-#' @return data frame containing the annotation and the computed ISH scores
+#' @return data frame containing the annotation and the computed WSH scores
 #' @author Michael Scherer
 #' @examples
 #' \donttest{
-#' load(system.file(file.path("extData","example_GRanges.RData"),package="ISH"))
-#' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
-#' example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+#' load(system.file(file.path("extData","example_GRanges.RData"),package="WSH"))
+#' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="WSH")
+#' example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
 #' fdrp <- compute.score(bam.file=example.bam,example.GRanges,score="fdrp")
 #' qfdrp <- compute.score(bam.file=example.bam,example.rnb.set,score="qfdrp")
 #' }
 #' @export
 compute.score <- function(bam.file,...,score="qfdrp"){
-  ish.check.validity(score)
+  wsh.check.validity(score)
   optlist <- list(...)
   if(length(optlist)==0&!(score%in%c("epipolymorphism","entropy"))){
     stop("Annotation inference only applicable for epipolymorphism and entropy. Please specify annotation.")
@@ -321,14 +321,14 @@ compute.score <- function(bam.file,...,score="qfdrp"){
   return(res)
 }
 
-#' ish.check.validity
+#' wsh.check.validity
 #'
 #' Checks if the score is compatible with the current setting, or if a non-valid score was specified.
 #'
 #' @param score Score to be checked
 #' @author Michael Scherer
 #' @noRd
-ish.check.validity <- function(score){
+wsh.check.validity <- function(score){
   if(!(score%in%VALID.SCORES)){
     stop(paste("Invalid value for score, must be one of",VALID.SCORES))
   }

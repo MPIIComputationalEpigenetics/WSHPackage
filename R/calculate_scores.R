@@ -70,12 +70,12 @@ toCpGs <- function(index,match_read_cpg,starts_cpgs,starts_reads,seqs_reads){
 #'                 read are heterogeneous. That means if there is at least one methylated and one
 #'                 umethylated CpG, the read is discordant, otherwise concordant.
 #'
-#' @author Michael Scherer
 #' @noRd
+#' @author Michael Scherer
 classify.read <- function(index,match_read_cpg,starts_cpgs,starts_reads,seqs_reads){
   covered_cpgs <- match_read_cpg[[index]]
-  #' This is one of the criteria implemented in the PDR, each read has to contain at least 4 CpGs to
-  #' be used for the classification into discordant/concordant
+  # This is one of the criteria implemented in the PDR, each read has to contain at least 4 CpGs to
+  # be used for the classification into discordant/concordant
   if(length(covered_cpgs)<4){
     return(NA)
   }
@@ -101,10 +101,10 @@ classify.read <- function(index,match_read_cpg,starts_cpgs,starts_reads,seqs_rea
 #' @return positions of the CpG sites that are at most WINDOW.SIZE away from one
 #'						another
 #'
-#' @author Michael Scherer
 #' @noRd
+#' @author Michael Scherer
 restrict <- function(positions,cpg){
-  #' We only restrict something, if the read is longer than 50 bp
+  # We only restrict something, if the read is longer than 50 bp
   if(!any(positions == cpg)) return(NA)
   distances <- abs(as.numeric(positions)-as.numeric(cpg))
   positions <- positions[distances<=get.option('window.size')]
@@ -198,17 +198,16 @@ restrict <- function(positions,cpg){
 #' @details The given read pair is only concordant, if all CpG sites that overlap between the
 #' 				reads reflect the same methylation status. Otherwise the read pair is classified
 #' 				as discordant.
-#'
-#' @author Michael Scherer
 #' @noRd
+#' @author Michael Scherer
 compute.discordant <- function(index,read1,read2,values,site){
-  #' this is the first read
+  # this is the first read
   q <- read1[index]
-  #' this is the second
+  # this is the second
   s <- read2[index]
-  #' the values are stored in the corresponding part of the GRanges object
+  # the values are stored in the corresponding part of the GRanges object
   v1 <- values[q]
-  #' we check if we have any information about the mehtylation state available
+  # we check if we have any information about the mehtylation state available
   if(length(v1)>0){
     v1 <- v1[[1]]
   }else{
@@ -220,7 +219,7 @@ compute.discordant <- function(index,read1,read2,values,site){
   }else{
     return(NA)
   }
-  #' now we match the corresponding positions to each other
+  # now we match the corresponding positions to each other
   names1 <- names(v1)
   names2 <- names(v2)
   both <- intersect(names1,names2)
@@ -232,10 +231,10 @@ compute.discordant <- function(index,read1,read2,values,site){
   intersection1 <- intersection1[!is.na(intersection1)]
   intersection2 <- v1[both]
   intersection2 <- intersection2[!is.na(intersection2)]
-  #' two reads are only concordant to each other if they reflect the same methylation
-  #' state at each position covered by the reads
-  #' we do a case distinction for either FDRP or qFDRP: while FDRP only classifies each read pair to either
-  #' discordant or concordant, the qFDRP computes the discordance fraction between the two reads
+  # two reads are only concordant to each other if they reflect the same methylation
+  # state at each position covered by the reads
+  # we do a case distinction for either FDRP or qFDRP: while FDRP only classifies each read pair to either
+  # discordant or concordant, the qFDRP computes the discordance fraction between the two reads
   if(get.option('fdrp.type')=='FDRP'){
     discordant <- any(intersection1 != intersection2)
   }else{
@@ -257,47 +256,46 @@ compute.discordant <- function(index,read1,read2,values,site){
 #'
 #' @details This function is called by calculate.fdrps.chromosome each CpG present on
 #' 				the chormosome and calls compute.discordant for each pair of reads.
-#'
-#' @author Michael Scherer
 #' @export
+#' @author Michael Scherer
 calculate.fdrp.site <- function(pos,cpg,reads,site){
   cpg <- cpg[[pos]]
   site <- site[[pos]]
-  #' we only consider the calculation if there are more than 2 reads for this CpG site
+  # we only consider the calculation if there are more than 2 reads for this CpG site
   if(length(cpg)<3){
     return(NA)
   }
-  #' the maximum number of reads to be calculated is 40, which already are
-  #' (1/2)*39*40 = 780 read pairs for a single site. Otherwise 40 reads are
-  #' are sampled from the all reads.
+  # the maximum number of reads to be calculated is 40, which already are
+  # (1/2)*39*40 = 780 read pairs for a single site. Otherwise 40 reads are
+  # are sampled from the all reads.
   if(length(cpg)>get.option('max.reads')){
     cpg <- sample(cpg,get.option('max.reads'))
   }
   selected <- reads[cpg]
   rm(reads)
 
-  #' here we calculate all pairs of the reads that the corresponding CpG site covers
-  #' we require the overlap to be at least 35 bp long
+  # here we calculate all pairs of the reads that the corresponding CpG site covers
+  # we require the overlap to be at least 35 bp long
   overlap <- findOverlaps(selected,selected,minoverlap=get.option('min.overlap'),ignore.strand=TRUE)
   query <- queryHits(overlap)
   if(length(query)==0){
     return(NA)
   }
   subject <- subjectHits(overlap)
-  #' we only consider each of the pairs once and the findOverlaps function calculates
-  #' all pairs in both directions
+  # we only consider each of the pairs once and the findOverlaps function calculates
+  # all pairs in both directions
   smaller <- query<subject
   query <- query[smaller]
   subject <- subject[smaller]
 
-  #' now we start with the calculation of the FDRP for the sample
+  # now we start with the calculation of the FDRP for the sample
   values <- values(selected)[,"CpG"]
   rm(selected)
-  #' query is as long as all read pairs we want to consider at this specific position
+  # query is as long as all read pairs we want to consider at this specific position
   ret <- as.list(1:length(query))
   ret <- lapply(ret,compute.discordant,query,subject,values,site)
   ret <- unlist(ret)
-  #' we actually calculate the FDRP as \frac{#discordant read pairs}{#all read pairs}
+  #' we actually calculate the FDRP as frac{#discordant read pairs}{#all read pairs}
   fdrp <- sum(ret,na.rm=TRUE)/length(ret)
   fdrp
 }
@@ -310,11 +308,11 @@ calculate.fdrp.site <- function(pos,cpg,reads,site){
 #'					of the PDR, already converted into the custom representation
 #' @return PDR score for the given CpG site
 #'
-#' @author Michael Scherer
 #' @export
+#' @author Michael Scherer
 calculate.pdr.site <- function(cpg,reads){
-  #' we only consider the calculation if the cpg site is covered by more than 10 reads
-  #' Another requirement stated in the PDR paper
+  # we only consider the calculation if the cpg site is covered by more than 10 reads
+  # Another requirement stated in the PDR paper
   if(length(cpg)<10){
     return(NA)
   }
@@ -322,10 +320,10 @@ calculate.pdr.site <- function(cpg,reads){
   selected <- reads[cpg]
   rm(reads)
 
-  #' We select the reads that contain the given CpG site
+  # We select the reads that contain the given CpG site
   values <- values(selected)[,"isDiscordant"]
   rm(selected)
-  #' we calculate the PDR as \frac{#discordant reads}{#all reads} that contain the given CpG
+  # we calculate the PDR as frac{#discordant reads}{#all reads} that contain the given CpG
   values <- unlist(values)
   pdr <- mean(values,na.rm=TRUE)
   pdr
@@ -346,10 +344,10 @@ calculate.pdr.site <- function(cpg,reads){
 #'
 #' @author Michael Scherer
 #'
+#' @export
 #' @import Rsamtools
 #' @import GenomicAlignments
 #' @import rtracklayer
-#' @export
 calculate.fdrp.by.chromosome <- function(bam, anno){
   chromosome <- as.character(seqnames(anno))[1]
   logger.start(paste('Calculation of',chromosome))
@@ -369,16 +367,16 @@ calculate.fdrp.by.chromosome <- function(bam, anno){
   newStyle <- newStyle[!is.na(newStyle)]
   range_reads <- renameSeqlevels(range_reads,newStyle)
 
-  #' we only analyze those CpGs that are covered (on average) by enough reads in the complete dataset
+  # we only analyze those CpGs that are covered (on average) by enough reads in the complete dataset
   overlap <- findOverlaps(range_reads,anno,ignore.strand=TRUE)
   query <- queryHits(overlap)
   query <- unique(query)
   range_reads <- range_reads[query]
 
   ####### REPRESENTATION ############
-  #' This part converts the raw sequencing reads from the alignment into
-  #' an representation, where only CpG positions are considered and from whom we
-  #' can infer discordance or concordance of reads
+  # This part converts the raw sequencing reads from the alignment into
+  # an representation, where only CpG positions are considered and from whom we
+  # can infer discordance or concordance of reads
   logger.start(paste('Representation',chromosome))
   range_cpgs <- ranges(anno)
   starts_cpgs <- start(range_cpgs)
@@ -390,7 +388,7 @@ calculate.fdrp.by.chromosome <- function(bam, anno){
   overlap <- findOverlaps(anno,range_reads,ignore.strand=TRUE)
   fdrps <- as.list(rep(NA,length(anno)))
   rm(anno)
-  #' for each read we convert the covered CpG sites into a custom representation
+  # for each read we convert the covered CpG sites into a custom representation
   read_representation <- as.list(1:length(range_reads))
   read_representation <- lapply(read_representation,toCpGs,match_read_cpg,starts_cpgs,starts_reads,seqs_reads)
   rm(match_read_cpg)
@@ -401,8 +399,8 @@ calculate.fdrp.by.chromosome <- function(bam, anno){
   logger.completed()
 
   ######### FDRP CALCULATION ###########
-  #' we only calculate the FDRP for the CpGs that are acutally covered by any read in the
-  #' corresponding sample
+  # we only calculate the FDRP for the CpGs that are acutally covered by any read in the
+  # corresponding sample
   logger.start(paste('FDRP',chromosome))
   match_cpg_reads <- as(overlap,"list")
   rm(overlap)
@@ -412,10 +410,10 @@ calculate.fdrp.by.chromosome <- function(bam, anno){
   starts_cpgs <- starts_cpgs[null]
   toApply <- 1:length(starts_cpgs)
   fdrps_actual <- lapply(toApply,calculate.fdrp.site,match_cpg_reads,range_reads,starts_cpgs)
-  #' when we do not have a read that covers this site, we set the FDRP for this site to NA
+  # when we do not have a read that covers this site, we set the FDRP for this site to NA
   fdrps[null] <- fdrps_actual
   fdrps <- unlist(fdrps)
-  #' here we set the name for the corresponding position in the genome
+  # here we set the name for the corresponding position in the genome
   logger.completed()
   logger.completed()
   fdrps
@@ -433,10 +431,10 @@ calculate.fdrp.by.chromosome <- function(bam, anno){
 #'
 #' @author Michael Scherer
 #'
+#' @export
 #' @import Rsamtools
 #' @import GenomicAlignments
 #' @import rtracklayer
-#' @export
 calculate.pdr.by.chromosome <- function(bam, anno){
   chromosome <- as.character(seqnames(anno))[1]
   logger.start(paste('Calculation of',chromosome))
@@ -456,14 +454,14 @@ calculate.pdr.by.chromosome <- function(bam, anno){
   newStyle <- newStyle[!is.na(newStyle)]
   range_reads <- renameSeqlevels(range_reads,newStyle)
 
-  #' we only analyze those CpGs that are covered (on average) by enough reads in the complete dataset
+  # we only analyze those CpGs that are covered (on average) by enough reads in the complete dataset
   overlap <- findOverlaps(range_reads,anno,ignore.strand=TRUE)
   query <- queryHits(overlap)
   query <- unique(query)
   range_reads <- range_reads[query]
 
   ####### REPRESENTATION ############
-  #'This part clasifies all reads into either discordant or concordant
+  #This part clasifies all reads into either discordant or concordant
   logger.start(paste('Representation',chromosome))
   range_cpgs <- ranges(anno)
   starts_cpgs <- start(range_cpgs)
@@ -475,7 +473,7 @@ calculate.pdr.by.chromosome <- function(bam, anno){
   overlap <- findOverlaps(anno,range_reads,ignore.strand=TRUE)
   pdrs <- as.list(rep(NA,length(anno)))
   rm(anno)
-  #' we classify each read into either discordant or concordant
+  # we classify each read into either discordant or concordant
   classified_reads <- as.list(1:length(range_reads))
   classified_reads <- lapply(classified_reads,classify.read,match_read_cpg,starts_cpgs,starts_reads,seqs_reads)
   rm(match_read_cpg)
@@ -487,8 +485,8 @@ calculate.pdr.by.chromosome <- function(bam, anno){
   logger.completed()
 
   ######### PDR CALCULATION ###########
-  #' Starting from the classification of the reads, we now calculate the actual PDR
-  #' values for the CpG sites of interest
+  # Starting from the classification of the reads, we now calculate the actual PDR
+  # values for the CpG sites of interest
   logger.start(paste('PDR',chromosome))
   match_cpg_reads <- as(overlap,"list")
   rm(overlap)
@@ -496,7 +494,7 @@ calculate.pdr.by.chromosome <- function(bam, anno){
   null <- unlist(null)
   match_cpg_reads <- match_cpg_reads[null]
   pdrs_actual <- lapply(match_cpg_reads,calculate.pdr.site,range_reads)
-  #' when we do not have a read that covers this site, we set the FDRP for this site to NA
+  # when we do not have a read that covers this site, we set the FDRP for this site to NA
   pdrs[null] <- pdrs_actual
   pdrs <- unlist(pdrs)
   logger.completed()

@@ -52,8 +52,8 @@ create.annotation <- function(rnb.path){
 #' @author Michael Scherer
 #' @examples
 #' \donttest{
-#' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
-#' example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+#' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="WSH")
+#' example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
 #' fdrp <- rnb.calculate.fdrp(rnb.set=example.rnb.set,bam.path=example.bam)
 #' }
 #' @export
@@ -79,8 +79,8 @@ rnb.calculate.fdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
 #' @author Michael Scherer
 #' @examples
 #' \donttest{
-#' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
-#' example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+#' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="WSH")
+#' example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
 #' fdrp <- rnb.calculate.qfdrp(rnb.set=example.rnb.set,bam.path=example.bam)
 #' }
 
@@ -107,8 +107,8 @@ rnb.calculate.qfdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
 #' @author Michael Scherer
 #' @examples
 #' \donttest{
-#' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
-#' example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+#' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="WSH")
+#' example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
 #' fdrp <- rnb.calculate.pdr(rnb.set=example.rnb.set,bam.path=example.bam)
 #' }
 

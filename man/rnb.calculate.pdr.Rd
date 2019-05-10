@@ -23,8 +23,8 @@ This function calculates the PDR scores for a given RnBSet and a bam file contai
 }
 \examples{
 \donttest{
-example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
-example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="WSH")
+example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
 fdrp <- rnb.calculate.pdr(rnb.set=example.rnb.set,bam.path=example.bam)
 }
 }

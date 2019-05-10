@@ -1,17 +1,17 @@
-#' unit testing for ISH R package
+#' unit testing for WSH R package
 
 #' checks if the example is correctly working
 test.example <- function(){
-  qfdrp <- ish.run.example()$qFDRP
-  fdrp <- ish.run.example("fdrp")$FDRP
-  pdr <- ish.run.example("pdr")$PDR
-  #mhl <- ish.run.example("mhl")
-  epipoly <- tryCatch(ish.run.example("epipolymorphism")$Epipolymorphism,error=function(e){
+  qfdrp <- wsh.run.example()$qFDRP
+  fdrp <- wsh.run.example("fdrp")$FDRP
+  pdr <- wsh.run.example("pdr")$PDR
+  #mhl <- wsh.run.example("mhl")
+  epipoly <- tryCatch(wsh.run.example("epipolymorphism")$Epipolymorphism,error=function(e){
     if(Sys.info()['sysname']=="Windows"){
      return(0)
     }
   })
-  entropy <- tryCatch(ish.run.example("entropy")$Entropy,error=function(e){
+  entropy <- tryCatch(wsh.run.example("entropy")$Entropy,error=function(e){
     if(Sys.info()['sysname']=="Windows"){
       return(0)
     }
@@ -20,9 +20,9 @@ test.example <- function(){
   checkTrue(passes)
 }
 
-#' tests function to compute ISH scores from GRanges objects
+#' tests function to compute WSH scores from GRanges objects
 test.GRanges <- function(){
-  example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
+  example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
   example.GRanges <- GRanges(Rle(rep("chr2",10)),IRanges(start = c(2298361,2298554,2298732,2298743,2298787,2298792,2298827,2298884,
                                                                    2298915,2298921),end=c(2298361,2298554,2298732,2298743,2298787,
                                                                                           2298792,2298827,2298884,2298915,2298921)+1))
@@ -31,10 +31,10 @@ test.GRanges <- function(){
   checkTrue(passes)
 }
 
-#' tests function to compute ISH scores from RnBSet objects
+#' tests function to compute WSH scores from RnBSet objects
  # test.rnbSet <- function(){
- #  example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
- #  example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
+ #  example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
+ #  example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="WSH")
  #  pdr <- compute.score(example.bam,example.rnb.set,score="pdr")
  #  passes <- is.numeric(pdr$PDR)
  #  checkTrue(passes)
@@ -59,8 +59,8 @@ test.options <- function(){
 }
 
  # test.option.influence <- function(){
- #   example.bam <- system.file(file.path("extData","small_example.bam"),package="ISH")
- #   example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="ISH")
+ #   example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
+ #   example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="WSH")
  #   fdrp.default <- rnb.calculate.fdrp(example.rnb.set,example.bam)
  #   set.option(coverage.threshold = 50)
  #   fdrp.new <- rnb.calculate.fdrp(example.rnb.set,example.bam)
@@ -75,7 +75,7 @@ test.options <- function(){
  # }
 
 test.genomebrowser <- function(){
-	qfdrp <- ish.run.example()
+	qfdrp <- wsh.run.example()
 	create.genomebrowser.track(qfdrp)
 	create.genomebrowser.track(qfdrp,bin.width=NULL)
 	res <- readLines("Sample_qFDRP.bed")
@@ -94,14 +94,14 @@ execute.unit.test <- function(){
     logger.start("Test GRanges function")
       test.GRanges()
     logger.completed()
-    #' Only test locally
+    # Only test locally
     # logger.start("Test RnBSet function")
     #   test.rnbSet()
     # logger.completed()
     logger.start("Test package options")
       test.options()
     logger.completed()
-    #' Only test locally
+    # Only test locally
     # logger.start("Test package option influence")
     #    test.option.influence()
     # logger.completed()
