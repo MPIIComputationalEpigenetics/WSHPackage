@@ -111,4 +111,4 @@ execute.unit.test <- function(){
   logger.completed()
 }
 
-execute.unit.test()
+#execute.unit.test()
