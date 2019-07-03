@@ -665,9 +665,9 @@ calculate.pdr <- function(bam.file,anno,log.path=getwd(),cores=1){
   anno <- anno[lengths(anno)>0]
   if(length(anno)>=22){
     anno <- anno[1:22]
-    first <- split.anno(anno[[1]])
+    first <- anno.split(anno[[1]])
     anno <- c(first,anno[2:22])
-    second <- split.anno(anno[[3]])
+    second <- anno.split(anno[[3]])
     anno <- c(anno[1:2],second,anno[4:23])
   }
   pdrs <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.pdr.by.chromosome','calculate.pdr.site','classify.read','convert','IHS.OPTIONS')) %dopar%{
