@@ -81,7 +81,7 @@
 \newcommand{\ra}[0]{$\rightarrow$}
 
 
-\title{WSH - R package for Intra-Sample Heterogeneity Scores}
+\title{WSH - R package for Within-Sample Heterogeneity Scores}
 
 \author{Michael Scherer}
 
@@ -94,12 +94,12 @@
 
 \section{Introduction}
 
-This vignette desribes the functionalities included in the WSH R package. We describe the Intra-Sample Heterogeneity Scores FDRP, qFDRP, PDR, MHL, Epipolymorphism and Entropy. The package is able to compute each of those scores from bisulfite sequencing data. Input should be a \textit{bam} file that contains reads that have been aligned to a reference genome. While PDR, qFDRP and FDRP are independent of the employed mapping tool, Epipolymorphism and Entropy require the reads to be aligned with bismark. In addition to the aligned reads, the user needs to specify the sites for which the scores should be computed in either of two ways: \texttt{GRanges}{http://bioconductor.org/packages/release/bioc/html/GenomicRanges.html} or \texttt{RnBSet} (\url{https://rnbeads.org/}).  Here, we only discuss how to use the package. A detailed description of each of the scores can be found in the corresponding publications.
+This vignette desribes the functionalities included in the WSH R package. We describe the Intra-Sample Heterogeneity Scores FDRP, qFDRP, PDR, MHL, Epipolymorphism and Entropy. The package is able to compute each of those scores from bisulfite sequencing data. Input should be a \textit{bam} file that contains reads that have been aligned to a reference genome. While PDR, qFDRP and FDRP are independent of the employed mapping tool, Epipolymorphism and Entropy require the reads to be aligned with bismark. In addition to the aligned reads, the user needs to specify the sites for which the scores should be computed in either of two ways: \texttt{GRanges} (\url{http://bioconductor.org/packages/release/bioc/html/GenomicRanges.html}) or \texttt{RnBSet} (\url{https://rnbeads.org/}).  Here, we only discuss how to use the package. A detailed description of each of the scores can be found in the corresponding publications.
 
 \section{Installation}
 
 The package is available from GitHub and can be installed by the following command, given that the \href{https://cran.r-project.org/web/packages/devtools/index.html}{devtools} package is installed:
-<<eval=TRUE>>=
+<<eval=FALSE>>=
 devtools::install_github("MPIIComputationalEpigenetics/WSHPackage")
 @
 You can test if the installed version is functioning by employing one of the examples in the package:
