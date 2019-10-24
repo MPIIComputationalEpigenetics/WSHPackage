@@ -99,8 +99,8 @@ This vignette desribes the functionalities included in the WSH R package. We des
 \section{Installation}
 
 The package is available from GitHub and can be installed by the following command, given that the \href{https://cran.r-project.org/web/packages/devtools/index.html}{devtools} package is installed:
-<<eval=FALSE>>=
-devtools::install_github("schmic05/WSH_package")
+<<eval=TRUE>>=
+devtools::install_github("MPIIComputationalEpigenetics/WSHPackage")
 @
 You can test if the installed version is functioning by employing one of the examples in the package:
 <<>>=
@@ -114,10 +114,15 @@ FDRP, qFDRP and PDR do not require any additional tools or scripts and can be co
 \begin{enumerate}
     \item \texttt{GRanges:} This object should contain the positions of the CpGs for which analysis is to be conducted. The \texttt{GRanges} object should contain a single entry for each CpG and only have length 1 for each of the entries. Then you can either run \texttt{compute.score.GRanges} directly or call the generic function \texttt{compute.score}.
 <<>>=
-example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
-example.GRanges <- GRanges(Rle(rep("chr2",10)),IRanges(start = c(2298361,2298554,2298732,2298743,2298787,2298792,2298827,2298884,
-                                                                 2298915,2298921),end=c(2298361,2298554,2298732,2298743,2298787,
-                                                                                        2298792,2298827,2298884,2298915,2298921)+1))
+example.bam <- system.file(file.path("extData","small_example.bam"),
+                           package="WSH")
+example.GRanges <- GRanges(Rle(rep("chr2",10)),
+                           IRanges(start=c(2298361,2298554,2298732,
+                                             2298743,2298787,2298792,
+                                             2298827,2298884,2298915,2298921),
+                                   end=c(2298361,2298554,2298732,
+                                         2298743,2298787,2298792,
+                                         2298827,2298884,2298915,2298921)+1))
 pdr <- compute.score(bam.file=example.bam,example.GRanges,score="pdr")
 @
 This returns a \textit{data.frame}, with the CpG positions (chromosome, start, end) in the first columns and the corresponding score in the last column.
@@ -128,13 +133,15 @@ head(pdr)
 
     \item \textbf{RnBSet:} In addition to \texttt{GRanges} objects, the WSH package supports \texttt{RnBSet} objects as input. Here, the annotation is inferred from the object's annotation with the addition of only selecting those sites that have a coverage higher than \textit{coverage.threhold} in the \texttt{RnBSet} object, given coverage information is present. For more details on how to set options for analysis, see \autoref{option_setting}.
 <<eval=FALSE,fig=FALSE>>=
-example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="WSH")
+example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),
+                               package="WSH")
 example.rnb.set <- load.rnb.set(example.rnb.set)
 set.option(coverage.threshold = 10)
 fdrp <- rnb.calculate.fdrp(example.rnb.set,example.bam)
 to.plot <- data.frame(qFDRP=qfdrp$qFDRP,FDRP=fdrp$FDRP)
 to.plot <- melt(to.plot)
-plot <- ggplot(to.plot,aes(x=value,y=..count..,fill=variable))+geom_histogram()+facet_grid(variable~.)+theme_bw()
+plot <- ggplot(to.plot,aes(x=value,y=..count..,fill=variable))+
+  geom_histogram()+facet_grid(variable~.)+theme_bw()
 plot
 @
 \end{enumerate}
@@ -144,7 +151,8 @@ In contrast to the scores above, MHL requires a working version of \texttt{perl}
 <<eval=FALSE>>=
 set.option(perl.path = "/usr/bin/perl")
 set.option(samtools.path = "/usr/bin/")
-mhl <- compute.score.rnb(bam.file = example.bam, rnb.set = example.rnb.set, score="mhl")
+mhl <- compute.score.rnb(bam.file = example.bam,
+                         rnb.set = example.rnb.set, score="mhl")
 @
 
 \subsection{Epipolymorphism and Entropy}
@@ -152,9 +160,11 @@ Epipolymorphism and Entropy calculations depend on the methclone software (\url{
 <<fig=FALSE,eval=FALSE>>=
 epipoly <- compute.score(example.bam,score="epipolymorphism")
 entropy <- compute.score(example.bam,score="entropy")
-to.plot <- data.frame(Epipolymorphism=epipoly$Epipolymorphism,Entropy=entropy$Entropy)
+to.plot <- data.frame(Epipolymorphism=epipoly$Epipolymorphism,
+                      Entropy=entropy$Entropy)
 to.plot <- melt(to.plot)
-plot <- ggplot(to.plot,aes(x=value,y=..density..,color=variable))+geom_density()+theme_bw()
+plot <- ggplot(to.plot,aes(x=value,y=..density..,color=variable))+
+  geom_density()+theme_bw()
 plot
 @
 \section{Advanced Configuration}
@@ -172,7 +182,8 @@ Using this package on a Windows OS, one can only compute qFDRP, FDRP and PDR, si
 \subsection{Exporting results to Genome Browser tracks}
 We provide a function to export the results as a Genome Browser track. WSH scores can either be aggregated over genomic bins (parameters \texttt{bin.width}, default = 5kb) or exported in single CpG format. The package will output a BED file with the information on the output generated with \texttt{compute.score}.
 <<>>=
-create.genomebrowser.track(score.output=qfdrp,bin.width=7500,sample.name="mySample")
+create.genomebrowser.track(score.output=qfdrp,
+                           bin.width=7500,sample.name="mySample")
 bed.file <- readLines("mySample_qFDRP.bed")
 head(bed.file)
 @
