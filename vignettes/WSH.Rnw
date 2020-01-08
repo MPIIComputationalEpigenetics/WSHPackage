@@ -94,15 +94,17 @@
 
 \section{Introduction}
 
-This vignette desribes the functionalities included in the WSH R package. We describe the Intra-Sample Heterogeneity Scores FDRP, qFDRP, PDR, MHL, Epipolymorphism and Entropy. The package is able to compute each of those scores from bisulfite sequencing data. Input should be a \textit{bam} file that contains reads that have been aligned to a reference genome. While PDR, qFDRP and FDRP are independent of the employed mapping tool, Epipolymorphism and Entropy require the reads to be aligned with bismark. In addition to the aligned reads, the user needs to specify the sites for which the scores should be computed in either of two ways: \texttt{GRanges} (\url{http://bioconductor.org/packages/release/bioc/html/GenomicRanges.html}) or \texttt{RnBSet} (\url{https://rnbeads.org/}).  Here, we only discuss how to use the package. A detailed description of each of the scores can be found in the corresponding publications.
+This vignette desribes the functionalities included in the WSH R package, which includes the Within-Sample Heterogeneity Scores FDRP, qFDRP, PDR, MHL, Epipolymorphism and Entropy. The package is able to compute each of those scores from bisulfite sequencing data. Input should be a \textit{bam} file that contains reads aligned to a reference genome, preferably the human reference genome version `hg38'. While PDR, qFDRP and FDRP are independent of the employed mapping tool, Epipolymorphism and Entropy only support bismark as the aligner. In addition to the aligned reads, the user needs to specify annotation of the sites for which the scores should be computed in either of two ways: \texttt{GRanges} (\url{http://bioconductor.org/packages/release/bioc/html/GenomicRanges.html}) or \texttt{RnBSet} (\url{https://rnbeads.org/}).  Here, we only discuss how to use the package. A detailed description of each of the scores can be found in the corresponding publications.
 
 \section{Installation}
 
 The package is available from GitHub and can be installed by the following command, given that the \href{https://cran.r-project.org/web/packages/devtools/index.html}{devtools} package is installed:
 <<eval=FALSE>>=
+if(!requireNamespace("devtools")) install.packages("devtools",repos = "https://cloud.r-project.org/")
 devtools::install_github("MPIIComputationalEpigenetics/WSHPackage")
 @
-You can test if the installed version is functioning by employing one of the examples in the package:
+
+You can test if the package was properly installed by executing one of the examples in the package:
 <<>>=
 library(WSH)
 qfdrp <- wsh.run.example()
@@ -125,13 +127,14 @@ example.GRanges <- GRanges(Rle(rep("chr2",10)),
                                          2298827,2298884,2298915,2298921)+1))
 pdr <- compute.score(bam.file=example.bam,example.GRanges,score="pdr")
 @
+
 This returns a \textit{data.frame}, with the CpG positions (chromosome, start, end) in the first columns and the corresponding score in the last column.
 <<>>=
 dim(pdr)
 head(pdr)
 @
 
-    \item \textbf{RnBSet:} In addition to \texttt{GRanges} objects, the WSH package supports \texttt{RnBSet} objects as input. Here, the annotation is inferred from the object's annotation with the addition of only selecting those sites that have a coverage higher than \textit{coverage.threhold} in the \texttt{RnBSet} object, given coverage information is present. For more details on how to set options for analysis, see \autoref{option_setting}.
+    \item \textbf{RnBSet:} In addition to \texttt{GRanges} objects, the WSH package supports \texttt{RnBSet} objects as input. Here, the annotation is inferred from the object's annotation. Furthermore, a coverage filtering step is executed, which filters sites with coverage lower than \textit{coverage.threhold} in the \texttt{RnBSet} object, given such information is present. For more details on how to set options for analysis, see \autoref{option_setting}.
 <<eval=FALSE,fig=FALSE>>=
 example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),
                                package="WSH")
@@ -147,7 +150,7 @@ plot
 \end{enumerate}
 
 \subsection{MHL}
-In contrast to the scores above, MHL requires a working version of \texttt{perl} installed on your machine. For Linux, this should in general be \texttt{/usr/bin/perl}, which is per default set in this package. In case you are using MacOS (why we do not support Windows is argued in \autoref{windows_problems}), you first need to specify the option \textit{perl.path}. Furthermore, a working version of \texttt{samtools} is required by the programs that compute MHL.
+In contrast to the scores above, MHL requires a working version of \texttt{perl} installed on your machine. For Linux systems, this should in general be \texttt{/usr/bin/perl}, which is per default set in this package. In case you are using MacOS (we do not support Windows, see \autoref{windows_problems}), you first need to specify the option \textit{perl.path}. Furthermore, a working version of \texttt{samtools} is required by the programs that compute MHL.
 <<eval=FALSE>>=
 set.option(perl.path = "/usr/bin/perl")
 set.option(samtools.path = "/usr/bin/")
@@ -167,17 +170,18 @@ plot <- ggplot(to.plot,aes(x=value,y=..density..,color=variable))+
   geom_density()+theme_bw()
 plot
 @
+
 \section{Advanced Configuration}
 \subsection{Option settings}
 \label{option_setting}
-The WSH package provides a bunch of options to set, which influence how the data is handled. This includes setting coverage thresholds on the annotation, distances between individual CpGs, or quality thresholds on reads to be considered in the calculation. For a detailed description of each of the options, see the R documentation.
+The WSH package provides several options, which influence how the data is handled. This includes setting coverage thresholds on the annotation, distances between individual CpGs, or quality thresholds on reads to be considered in the calculation. For a detailed description of each of the options, see the R documentation or the \href{../man/ISH.pdf}{reference manual}.
 <<>>=
 ?set.option
 @
 
 \subsection{Windows troubleshooting}
 \label{windows_problems}
-Using this package on a Windows OS, one can only compute qFDRP, FDRP and PDR, since they don't rely on external tools. In contrast to that, MHL depends on both \texttt{perl} and \texttt{samtools}, and since \texttt{samtools} is not easily installable on a Windows machine, we exclude this computation in case of a Windows. Epipolymorphism and Entropy depend on the methclone software, which is not supported for Windows and we thus also exclude this.
+qFDRP, FDRP and PDR are the only scores supported on Windows machines, since they do not rely on external tools. In contrast, MHL depends on both \texttt{perl} and \texttt{samtools}, and since \texttt{samtools} is not easily installable on a Windows machine, we MHL cannot be computed on a Windows machine. Epipolymorphism and Entropy depend on the methclone software, which is not supported for Windows and we thus also not support it here.
 
 \subsection{Exporting results to Genome Browser tracks}
 We provide a function to export the results as a Genome Browser track. WSH scores can either be aggregated over genomic bins (parameters \texttt{bin.width}, default = 5kb) or exported in single CpG format. The package will output a BED file with the information on the output generated with \texttt{compute.score}.

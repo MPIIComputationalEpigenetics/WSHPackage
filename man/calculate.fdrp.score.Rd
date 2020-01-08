@@ -4,8 +4,13 @@
 \alias{calculate.fdrp.score}
 \title{calculate.fdrp.score}
 \usage{
-calculate.fdrp.score(bam.file, anno, log.path = getwd(), cores = 1,
-  window.size = get.option("WINDOW.SIZE"))
+calculate.fdrp.score(
+  bam.file,
+  anno,
+  log.path = getwd(),
+  cores = 1,
+  window.size = get.option("WINDOW.SIZE")
+)
 }
 \arguments{
 \item{bam.file}{bath to the bam file to be analyzed

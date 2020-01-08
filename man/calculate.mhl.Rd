@@ -4,8 +4,13 @@
 \alias{calculate.mhl}
 \title{calculate.mhl}
 \usage{
-calculate.mhl(roi, bam.file, out.folder = getwd(),
-  out.name = "mhl.txt", bam.type = "bismark")
+calculate.mhl(
+  roi,
+  bam.file,
+  out.folder = getwd(),
+  out.name = "mhl.txt",
+  bam.type = "bismark"
+)
 }
 \arguments{
 \item{roi}{Region of interest for which haplotype information should be computed}

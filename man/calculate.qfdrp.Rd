@@ -4,8 +4,13 @@
 \alias{calculate.qfdrp}
 \title{calculate.qfdrp}
 \usage{
-calculate.qfdrp(bam.file, anno, log.path = getwd(), cores = 1,
-  window.size = get.option("WINDOW.SIZE"))
+calculate.qfdrp(
+  bam.file,
+  anno,
+  log.path = getwd(),
+  cores = 1,
+  window.size = get.option("WINDOW.SIZE")
+)
 }
 \arguments{
 \item{bam.file}{bath to the bam file to be analyzed

@@ -6,7 +6,7 @@ R package for the calculation of the following Intra-Sample Heterogeneity Scores
 This package is distributed under the GNU GPL-3 license with the exception of the external tools located in *inst/bin* (methclone, GNU Lesser GPL) and *inst/scripts* (MHL scripts, software distribution granted in the source file). All remaining code may be used, copied, changed and further distributed.
 
 ## Documentation
-The WSH R-package is documented [here](vignettes/WSH.pdf)
+The WSH R-package is documented [here](vignettes/WSH.md)
 
 ## Contact
 You can contact [Michael Scherer](mailto:mscherer@mpi-inf.mpg.de) for reporting bugs, feature requests or questions.

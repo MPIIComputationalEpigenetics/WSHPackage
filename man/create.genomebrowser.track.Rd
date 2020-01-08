@@ -4,8 +4,12 @@
 \alias{create.genomebrowser.track}
 \title{create.genomebrowser.track}
 \usage{
-create.genomebrowser.track(score.output, sample.name = "Sample",
-  store.path = getwd(), bin.width = 5000)
+create.genomebrowser.track(
+  score.output,
+  sample.name = "Sample",
+  store.path = getwd(),
+  bin.width = 5000
+)
 }
 \arguments{
 \item{score.output}{The output as generated through compute.score or compute.score.GRanges: a

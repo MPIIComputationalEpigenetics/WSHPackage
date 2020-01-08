@@ -4,8 +4,11 @@
 \alias{calculate.epipolymorphism}
 \title{calculate.epipolymorphism}
 \usage{
-calculate.epipolymorphism(bam.file, out.folder = getwd(),
-  out.name = "methclone")
+calculate.epipolymorphism(
+  bam.file,
+  out.folder = getwd(),
+  out.name = "methclone"
+)
 }
 \arguments{
 \item{bam.file}{path to bam file containing the reads of the data set}

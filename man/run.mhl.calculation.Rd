@@ -4,8 +4,7 @@
 \alias{run.mhl.calculation}
 \title{run.mhl.calculation}
 \usage{
-run.mhl.calculation(hapinfo.file, out.folder = getwd(),
-  out.name = "mhl.txt")
+run.mhl.calculation(hapinfo.file, out.folder = getwd(), out.name = "mhl.txt")
 }
 \arguments{
 \item{hapinfo.file}{path to haplotype information file as produced by \code{\link{run.haplotype.calculation}}}

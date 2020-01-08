@@ -4,10 +4,17 @@
 \alias{set.option}
 \title{set.option}
 \usage{
-set.option(window.size = 50, mapq.filter = 35, max.reads = 40,
-  min.overlap = 35, fdrp.type = "FDRP", coverage.threshold = 10,
-  methclone.methylation.diff = 0, perl.path = "/usr/bin/perl",
-  samtools.path = "/usr/bin")
+set.option(
+  window.size = 50,
+  mapq.filter = 35,
+  max.reads = 40,
+  min.overlap = 35,
+  fdrp.type = "FDRP",
+  coverage.threshold = 10,
+  methclone.methylation.diff = 0,
+  perl.path = "/usr/bin/perl",
+  samtools.path = "/usr/bin"
+)
 }
 \arguments{
 \item{window.size}{Window around the CpG site of interest to consider in FDRP and qFDRP calculation, the higher the value, the more

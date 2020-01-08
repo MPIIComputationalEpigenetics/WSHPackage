@@ -4,8 +4,13 @@
 \alias{run.haplotype.calculation}
 \title{run.haplotype.calculation}
 \usage{
-run.haplotype.calculation(roi, bam.file, out.folder = getwd(),
-  out.name = "hapinfo.txt", bam.type = "bismark")
+run.haplotype.calculation(
+  roi,
+  bam.file,
+  out.folder = getwd(),
+  out.name = "hapinfo.txt",
+  bam.type = "bismark"
+)
 }
 \arguments{
 \item{roi}{Region of interest for which haplotype information should be computed}

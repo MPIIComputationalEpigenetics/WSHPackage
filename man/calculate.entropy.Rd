@@ -4,8 +4,7 @@
 \alias{calculate.entropy}
 \title{calculate.entropy}
 \usage{
-calculate.entropy(bam.file, out.folder = getwd(),
-  out.name = "methclone")
+calculate.entropy(bam.file, out.folder = getwd(), out.name = "methclone")
 }
 \arguments{
 \item{bam.file}{path to bam file containing the reads of the data set}
