@@ -1,13 +1,11 @@
-WSH - R package for Within-Sample Heterogeneity Scores {.titleHead}
+WSH - R package for Within-Sample Heterogeneity Scores
 ------------------------------------------------------
 
 Michael Scherer
 
-\
-
 January 8, 2020
 
-### Contents {.likesectionHead}
+### Contents
 
 1 [Introduction](#x1-20001)\
 2 [Installation](#x1-30002)\
@@ -20,7 +18,7 @@ January 8, 2020
  4.2 [Windows troubleshooting](#x1-100004.2)\
  4.3 [Exporting results to Genome Browser tracks](#x1-110004.3)
 
-### 1 Introduction {.sectionHead}
+### 1 Introduction
 
 This vignette desribes the functionalities included in the WSH R
 package, which includes the Within-Sample Heterogeneity Scores FDRP,
@@ -37,32 +35,37 @@ or RnBSet (<https://rnbeads.org/>). Here, we only discuss how to use the
 package. A detailed description of each of the scores can be found in
 the corresponding publications.
 
-### 2 Installation {.sectionHead}
+### 2 Installation
 
 The package is available from GitHub and can be installed by the
 following command, given that the
 [devtools](https://cran.r-project.org/web/packages/devtools/index.html)
 package is installed:
 
-  \> if(!requireNamespace("devtools")) install.packages("devtools",repos = "https://cloud.r-project.org/")\
-  \> devtools::install\_github("MPIIComputationalEpigenetics/WSHPackage")
-
+```r
+if(!requireNamespace("devtools")) install.packages("devtools",repos = "https://cloud.r-project.org/")\
+devtools::install\_github("MPIIComputationalEpigenetics/WSHPackage")
+```
 You can test if the package was properly installed by executing one of
 the examples in the package:
 
-  \> library(WSH)\
-  \> qfdrp \<- wsh.run.example()
+```r
+library(WSH)\
+qfdrp \<- wsh.run.example()
+```
 
-  2020-01-08 18:27:53     1.1  STATUS STARTED WSH score example\
-  2020-01-08 18:27:53     1.1  STATUS     STARTED Removing Sex chromosomes\
-  2020-01-08 18:27:53     1.1  STATUS     COMPLETED Removing Sex chromosomes\
-  2020-01-08 18:27:54     1.1  STATUS     STARTED qFDRP calculation\
-  2020-01-08 18:28:31     1.1  STATUS     COMPLETED qFDRP calculation\
-  2020-01-08 18:28:31     1.1  STATUS COMPLETED WSH score example
+```
+## 2020-01-08 18:27:53     1.1  STATUS STARTED WSH score example\
+## 2020-01-08 18:27:53     1.1  STATUS     STARTED Removing Sex chromosomes\
+## 2020-01-08 18:27:53     1.1  STATUS     COMPLETED Removing Sex chromosomes\
+## 2020-01-08 18:27:54     1.1  STATUS     STARTED qFDRP calculation\
+## 2020-01-08 18:28:31     1.1  STATUS     COMPLETED qFDRP calculation\
+## 2020-01-08 18:28:31     1.1  STATUS COMPLETED WSH score example
+```
 
-### 3 Computing WSH scores {.sectionHead}
+### 3 Computing WSH scores
 
-#### 3.1 FDRP, qFDRP and PDR {.subsectionHead}
+#### 3.1 FDRP, qFDRP and PDR
 
 FDRP, qFDRP and PDR do not require any additional tools or scripts and
 can be computed directly from your bam ﬁle. In this case, the score
@@ -76,39 +79,50 @@ should be computed in either of two forms: GRanges or RnBSet.
     entries. Then you can either run compute.score.GRanges directly or
     call the generic function compute.score.
 
-      \> example.bam \<- system.file(file.path("extData","small\_example.bam"),\
-      +                            package="WSH")\
-      \> example.GRanges \<- GRanges(Rle(rep("chr2",10)),\
-      +                            IRanges(start=c(2298361,2298554,2298732,\
-      +                                              2298743,2298787,2298792,\
-      +                                              2298827,2298884,2298915,2298921),\
-      +                                    end=c(2298361,2298554,2298732,\
-      +                                          2298743,2298787,2298792,\
-      +                                          2298827,2298884,2298915,2298921)+1))\
-      \> pdr \<- compute.score(bam.file=example.bam,example.GRanges,score="pdr")
-
-      2020-01-08 18:28:31     1.2  STATUS STARTED PDR calculation\
-      2020-01-08 18:28:31     1.2  STATUS     STARTED Removing Sex chromosomes\
-      2020-01-08 18:28:31     1.2  STATUS     COMPLETED Removing Sex chromosomes\
-      2020-01-08 18:28:45     1.2  STATUS COMPLETED PDR calculation
-
+    ```r
+    example.bam \<- system.file(file.path("extData","small\_example.bam"),\
+    +                            package="WSH")\
+    example.GRanges \<- GRanges(Rle(rep("chr2",10)),\
+                                IRanges(start=c(2298361,2298554,2298732,\
+                                                  2298743,2298787,2298792,\
+                                                  2298827,2298884,2298915,2298921),\
+                                        end=c(2298361,2298554,2298732,\
+                                              2298743,2298787,2298792,\
+                                              2298827,2298884,2298915,2298921)+1))\
+    pdr \<- compute.score(bam.file=example.bam,example.GRanges,score="pdr")
+    ```
+    
+    ```
+    ## 2020-01-08 18:28:31     1.2  STATUS STARTED PDR calculation\
+    ## 2020-01-08 18:28:31     1.2  STATUS     STARTED Removing Sex chromosomes\
+    ## 2020-01-08 18:28:31     1.2  STATUS     COMPLETED Removing Sex chromosomes\
+    ## 2020-01-08 18:28:45     1.2  STATUS COMPLETED PDR calculation
+    ```
+    
     This returns a data.frame, with the CpG positions (chromosome,
     start, end) in the ﬁrst columns and the corresponding score in the
     last column.
 
-      \> dim(pdr)
+    ```r
+    dim(pdr)
+    ```
 
-      [1] 10  4
+    ```
+    ## [1] 10  4
+    ```
+    ```r
+    head(pdr)
+    ```
 
-      \> head(pdr)
-
-        chromosome   start     end       PDR\
-      1       chr2 2298361 2298362       NaN\
-      2       chr2 2298554 2298555       NaN\
-      3       chr2 2298732 2298733 0.2413793\
-      4       chr2 2298743 2298744 0.2372881\
-      5       chr2 2298787 2298788 0.2337662\
-      6       chr2 2298792 2298793 0.2337662
+    ```  
+    ##   chromosome   start     end       PDR\
+    ## 1       chr2 2298361 2298362       NaN\
+    ## 2       chr2 2298554 2298555       NaN\
+    ## 3       chr2 2298732 2298733 0.2413793\
+    ## 4       chr2 2298743 2298744 0.2372881\
+    ## 5       chr2 2298787 2298788 0.2337662\
+    ## 6       chr2 2298792 2298793 0.2337662
+    ```
 
 2.  RnBSet: In addition to GRanges objects, the WSH package supports
     RnBSet objects as input. Here, the annotation is inferred from the
@@ -117,18 +131,21 @@ should be computed in either of two forms: GRanges or RnBSet.
     coverage.threhold in the RnBSet object, given such information is
     present. For more details on how to set options for analysis, see
     [subsection 4.1](#x1-90004.1).
-      \> example.rnb.set \<- system.file(file.path("extData","small\_rnbSet.zip"),\
-      +                                package="WSH")\
-      \> example.rnb.set \<- load.rnb.set(example.rnb.set)\
-      \> set.option(coverage.threshold = 10)\
-      \> fdrp \<- rnb.calculate.fdrp(example.rnb.set,example.bam)\
-      \> to.plot \<- data.frame(qFDRP=qfdrp\$qFDRP,FDRP=fdrp\$FDRP)\
-      \> to.plot \<- melt(to.plot)\
-      \> plot \<- ggplot(to.plot,aes(x=value,y=..count..,fill=variable))+\
-      +   geom\_histogram()+facet\_grid(variable\~.)+theme\_bw()\
-      \> plot
-
-#### 3.2 MHL {.subsectionHead}
+    
+    ```r
+    ## \> example.rnb.set \<- system.file(file.path("extData","small\_rnbSet.zip"),\
+    ## +                                package="WSH")\
+    ## \> example.rnb.set \<- load.rnb.set(example.rnb.set)\
+    ## \> set.option(coverage.threshold = 10)\
+    ## \> fdrp \<- rnb.calculate.fdrp(example.rnb.set,example.bam)\
+    ## \> to.plot \<- data.frame(qFDRP=qfdrp\$qFDRP,FDRP=fdrp\$FDRP)\
+    ## \> to.plot \<- melt(to.plot)\
+    ## \> plot \<- ggplot(to.plot,aes(x=value,y=..count..,fill=variable))+\
+    ## +   geom\_histogram()+facet\_grid(variable\~.)+theme\_bw()\
+    ## \> plot
+    ```
+    
+#### 3.2 MHL
 
 In contrast to the scores above, MHL requires a working version of perl
 installed on your machine. For Linux systems, this should in general be
@@ -138,10 +155,12 @@ using MacOS (we do not support Windows, see
 perl.path. Furthermore, a working version of samtools is required by the
 programs that compute MHL.
 
-  \> set.option(perl.path = "/usr/bin/perl")\
-  \> set.option(samtools.path = "/usr/bin/")\
-  \> mhl \<- compute.score.rnb(bam.file = example.bam,\
-  +                          rnb.set = example.rnb.set, score="mhl")
+```r
+## \> set.option(perl.path = "/usr/bin/perl")\
+## \> set.option(samtools.path = "/usr/bin/")\
+## \> mhl \<- compute.score.rnb(bam.file = example.bam,\
+## +                          rnb.set = example.rnb.set, score="mhl")
+```
 
 #### 3.3 Epipolymorphism and Entropy {.subsectionHead}
 
@@ -157,14 +176,16 @@ annotation object (either GRanges or RnBSet), since methclone operates
 as a black box and produces scores at positions directly inferred from
 the bam ﬁle.
 
-  \> epipoly \<- compute.score(example.bam,score="epipolymorphism")\
-  \> entropy \<- compute.score(example.bam,score="entropy")\
-  \> to.plot \<- data.frame(Epipolymorphism=epipoly\$Epipolymorphism,\
-  +                       Entropy=entropy\$Entropy)\
-  \> to.plot \<- melt(to.plot)\
-  \> plot \<- ggplot(to.plot,aes(x=value,y=..density..,color=variable))+\
-  +   geom\_density()+theme\_bw()\
-  \> plot
+``` r
+## \> epipoly \<- compute.score(example.bam,score="epipolymorphism")\
+## \> entropy \<- compute.score(example.bam,score="entropy")\
+## \> to.plot \<- data.frame(Epipolymorphism=epipoly\$Epipolymorphism,\
+## +                       Entropy=entropy\$Entropy)\
+## \> to.plot \<- melt(to.plot)\
+## \> plot \<- ggplot(to.plot,aes(x=value,y=..density..,color=variable))+\
+## +   geom\_density()+theme\_bw()\
+## \> plot
+```
 
 ### 4 Advanced Conﬁguration {.sectionHead}
 
@@ -177,7 +198,9 @@ considered in the calculation. For a detailed description of each of the
 options, see the R documentation or the [reference
 manual](../man/ISH.pdf).
 
-  \> ?set.option
+``` r
+## \> ?set.option
+```
 
 #### 4.2 Windows troubleshooting {.subsectionHead}
 
@@ -196,15 +219,17 @@ bin.width, default = 5kb) or exported in single CpG format. The package
 will output a BED ﬁle with the information on the output generated with
 compute.score.
 
-  \> create.genomebrowser.track(score.output=qfdrp,\
-  +                            bin.width=7500,sample.name="mySample")\
-  \> bed.file \<- readLines("mySample\_qFDRP.bed")\
-  \> head(bed.file)
-
-  [1] "browser position chr2:2298361-2305861"\
-  [2] "track type=bed name=\\"mySample\\" description=\\"qFDRP scores in 7500 tiles\\" useScore=1"\
-  [3] "chr2 2298361 2305861 '9%'  8.76"\
-  [4] "chr2 2305861 2313361 '10%' 10.37"\
-  [5] "chr2 2313361 2320861 '10%'  9.92"\
-  [6] "chr2 2320861 2328361 '10%'  9.89"
-
+``` r
+\> create.genomebrowser.track(score.output=qfdrp,\
++                            bin.width=7500,sample.name="mySample")\
+\> bed.file \<- readLines("mySample\_qFDRP.bed")\
+\> head(bed.file)
+```
+``` 
+## [1] "browser position chr2:2298361-2305861"\
+## [2] "track type=bed name=\\"mySample\\" description=\\"qFDRP scores in 7500 tiles\\" useScore=1"\
+## [3] "chr2 2298361 2305861 '9%'  8.76"\
+## [4] "chr2 2305861 2313361 '10%' 10.37"\
+## [5] "chr2 2313361 2320861 '10%'  9.92"\
+## [6] "chr2 2320861 2328361 '10%'  9.89"
+```
