@@ -133,16 +133,16 @@ should be computed in either of two forms: GRanges or RnBSet.
     [subsection 4.1](#x1-90004.1).
     
     ```r
-    ## example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),
-    ## +                                package="WSH")
-    ## example.rnb.set <- load.rnb.set(example.rnb.set)
-    ## set.option(coverage.threshold = 10)
-    ## fdrp <- rnb.calculate.fdrp(example.rnb.set,example.bam)
-    ## to.plot <- data.frame(qFDRP=qfdrp\$qFDRP,FDRP=fdrp$FDRP)
-    ## to.plot <- melt(to.plot)
-    ## plot <- ggplot(to.plot,aes(x=value,y=..count..,fill=variable))+
-    ## +   geom_histogram()+facet_grid(variable~.)+theme_bw()
-    ## plot
+    example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),
+    +                                package="WSH")
+    example.rnb.set <- load.rnb.set(example.rnb.set)
+    set.option(coverage.threshold = 10)
+    fdrp <- rnb.calculate.fdrp(example.rnb.set,example.bam)
+    to.plot <- data.frame(qFDRP=qfdrp\$qFDRP,FDRP=fdrp$FDRP)
+    to.plot <- melt(to.plot)
+    plot <- ggplot(to.plot,aes(x=value,y=..count..,fill=variable))+
+    +   geom_histogram()+facet_grid(variable~.)+theme_bw()
+    plot
     ```
     
 #### 3.2 MHL
@@ -156,10 +156,10 @@ perl.path. Furthermore, a working version of samtools is required by the
 programs that compute MHL.
 
 ```r
-## set.option(perl.path = "/usr/bin/perl")
-## set.option(samtools.path = "/usr/bin/")
-## mhl <- compute.score.rnb(bam.file = example.bam,
-## +                          rnb.set = example.rnb.set, score="mhl")
+set.option(perl.path = "/usr/bin/perl")
+set.option(samtools.path = "/usr/bin/")
+mhl <- compute.score.rnb(bam.file = example.bam,
++                          rnb.set = example.rnb.set, score="mhl")
 ```
 
 #### 3.3 Epipolymorphism and Entropy
@@ -177,14 +177,14 @@ as a black box and produces scores at positions directly inferred from
 the bam ﬁle.
 
 ``` r
-## epipoly <- compute.score(example.bam,score="epipolymorphism")
-## entropy <- compute.score(example.bam,score="entropy")
-## to.plot <- data.frame(Epipolymorphism=epipoly\$Epipolymorphism,
-## +                       Entropy=entropy$Entropy)
-## to.plot <- melt(to.plot)
-## plot <- ggplot(to.plot,aes(x=value,y=..density..,color=variable))+
-## +   geom_density()+theme_bw()
-## plot
+epipoly <- compute.score(example.bam,score="epipolymorphism")
+entropy <- compute.score(example.bam,score="entropy")
+to.plot <- data.frame(Epipolymorphism=epipoly\$Epipolymorphism,
++                       Entropy=entropy$Entropy)
+to.plot <- melt(to.plot)
+plot <- ggplot(to.plot,aes(x=value,y=..density..,color=variable))+
++   geom_density()+theme_bw()
+plot
 ```
 
 ### 4 Advanced Conﬁguration
