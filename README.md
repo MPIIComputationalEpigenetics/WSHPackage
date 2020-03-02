@@ -1,5 +1,5 @@
 # WSH
-[![Build Status](https://travis-ci.org/schmic05/WSH_package.svg?branch=master)](https://travis-ci.org/schmic05/WSH_package)
+[![Build Status](https://travis-ci.org/MPIIComputationalEpigenetics/WSHPackage.svg?branch=master)](https://travis-ci.org/schmic05/WSH_package)
 
 ## Short description
 R package for the calculation of the following Intra-Sample Heterogeneity Scores in Bisulfite Sequencing Data: FDRP, qFDRP, PDR, Epipolymorphism, Methylation Entropy and MHL
