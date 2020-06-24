@@ -22,7 +22,7 @@ qFDRP scores for the CpG sites in the RnBSet with a higher coverage than COVERAG
 This function calculates the qFDRP scores for a given RnBSet and a bam file containing the reads.
 }
 \examples{
-\donttest{
+\dontrun{
 example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="WSH")
 example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
 fdrp <- rnb.calculate.qfdrp(rnb.set=example.rnb.set,bam.path=example.bam)
