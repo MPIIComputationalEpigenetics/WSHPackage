@@ -7,13 +7,13 @@
 R package for the calculation of the following Intra-Sample Heterogeneity Scores in Bisulfite Sequencing Data: FDRP, qFDRP, PDR, Epipolymorphism, Methylation Entropy and MHL. The package is distributed under the GNU GPL-3 license, except for the external tools located in *inst/bin* (methclone, GNU Lesser GPL) and *inst/scripts* (MHL scripts, software distribution granted in the source file). All remaining code may be used, copied, changed and further distributed.
 
 ## Installation
-```{r}
+```r
 if(!requireNamespace("devtools")) install.packages("devtools",repos = "https://cloud.r-project.org/")
 devtools::install_github("MPIIComputationalEpigenetics/WSHPackage")
 ```
 
 ## Documentation
-```{r}
+```r
 example.bam <- system.file(file.path("extData","small_example.bam"),
                            package="WSH")
 example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),
