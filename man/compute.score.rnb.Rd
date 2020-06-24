@@ -21,7 +21,7 @@ data frame containing the annotation and the computed WSH scores
 Main function to compute WSH scores based on a input RnBSet and a bam file containing the reads.
 }
 \examples{
-\donttest{
+\dontrun{
 example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="WSH")
 example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
 fdrp <- compute.score.rnb(bam.file=example.bam,rnb.set=example.rnb.set)

@@ -4,7 +4,9 @@
 \name{VALID.SCORES}
 \alias{VALID.SCORES}
 \title{main.R}
-\format{An object of class \code{character} of length 6.}
+\format{
+An object of class \code{character} of length 6.
+}
 \usage{
 VALID.SCORES
 }

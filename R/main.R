@@ -179,7 +179,7 @@ wsh.run.example <- function(score="qfdrp"){
 #' @return data frame containing the annotation and the computed WSH scores
 #' @author Michael Scherer
 #' @examples
-#' \donttest{
+#' \dontrun{
 #' example.rnb.set <- system.file(file.path("extData","small_rnbSet.zip"),package="WSH")
 #' example.bam <- system.file(file.path("extData","small_example.bam"),package="WSH")
 #' fdrp <- compute.score.rnb(bam.file=example.bam,rnb.set=example.rnb.set)
