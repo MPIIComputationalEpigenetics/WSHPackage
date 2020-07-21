@@ -1,5 +1,5 @@
 # WSH
-[![Build Status](https://travis-ci.org/MPIIComputationalEpigenetics/WSHPackage.svg?branch=master)](https://travis-ci.org/schmic05/WSH_package)
+[![Build Status](https://travis-ci.org/MPIIComputationalEpigenetics/WSHPackage.svg?branch=master)](https://travis-ci.org/MPIIComputationalEpigenetics/WSHPackage)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![DOI: 10.1093/nar/gkaa120](https://zenodo.org/badge/doi/10.1093/nar/gkaa120.svg)](https://doi.org/10.1093/nar/gkaa120)
 
