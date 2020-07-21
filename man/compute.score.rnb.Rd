@@ -4,7 +4,12 @@
 \alias{compute.score.rnb}
 \title{compute.score.rnb}
 \usage{
-compute.score.rnb(bam.file, rnb.set, score = "qfdrp")
+compute.score.rnb(
+  bam.file,
+  rnb.set,
+  score = "qfdrp",
+  use.sex.chromosomes = use.sex.chromosomes
+)
 }
 \arguments{
 \item{bam.file}{path to bam file containing the reads}
@@ -13,6 +18,8 @@ compute.score.rnb(bam.file, rnb.set, score = "qfdrp")
 
 \item{score}{The WSH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
 \code{entropy} or \code{mhl}}
+
+\item{use.sex.chromosomes}{Flag indicating if scores are also to be computed for the sex chromosomes}
 }
 \value{
 data frame containing the annotation and the computed WSH scores

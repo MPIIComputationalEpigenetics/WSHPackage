@@ -4,7 +4,7 @@
 \alias{compute.score}
 \title{compute.score}
 \usage{
-compute.score(bam.file, ..., score = "qfdrp")
+compute.score(bam.file, ..., score = "qfdrp", use.sex.chromosomes = FALSE)
 }
 \arguments{
 \item{bam.file}{path to bam file containing the reads}
@@ -13,6 +13,8 @@ compute.score(bam.file, ..., score = "qfdrp")
 
 \item{score}{The WSH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
 \code{entropy} or \code{mhl}}
+
+\item{use.sex.chromosomes}{Flag indicating if scores are also to be computed for the sex chromosomes}
 }
 \value{
 data frame containing the annotation and the computed WSH scores

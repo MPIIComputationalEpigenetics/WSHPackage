@@ -4,7 +4,13 @@
 \alias{calculate.pdr}
 \title{calculate.pdr}
 \usage{
-calculate.pdr(bam.file, anno, log.path = getwd(), cores = 1)
+calculate.pdr(
+  bam.file,
+  anno,
+  log.path = getwd(),
+  cores = 1,
+  use.sex.chromosomes = FALSE
+)
 }
 \arguments{
 \item{bam.file}{bath to the bam file to be analyzed
@@ -15,6 +21,8 @@ already aligned to a reference genome}
 \item{log.path}{location of the log file}
 
 \item{cores}{number of cores available for the analysis}
+
+\item{use.sex.chromosomes}{Flag indicating if scores are also to be computed for the sex chromosomes}
 }
 \value{
 PDR scores for the given annotation.

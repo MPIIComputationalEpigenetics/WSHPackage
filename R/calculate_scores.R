@@ -502,28 +502,6 @@ calculate.pdr.by.chromosome <- function(bam, anno){
   pdrs
 }
 
-#' anno.split
-#' This function splits an annotation as a GRanges object into a GRangesList
-#' with two entries.
-#'
-#' @param anno annotation as a GRanges object to be split into two annotations
-#' @return GRangesList object with two more or less equally sized parts
-#'
-#' @details the first with lower starting points as the half of the
-#' maximum starting number and the second with the remaining. In the best case,
-#' the two annotations are equally sized in the end.
-#'
-#' @author Michael Scherer
-#' @noRd
-anno.split <- function(anno){
-  start <- start(ranges(anno)[1])
-  end <- end(ranges(anno)[length(anno)])
-  end <- round(end/2,0)
-  part1 <- anno[end(ranges(anno))<=end]
-  part2 <- anno[start(ranges(anno))>end]
-  return(GRangesList(part1,part2))
-}
-
 #' calculate.fdrp.score
 #'
 #' This function calculates the FDRPs/qFDRPs (depending on how the options are set) for all CpG sites in
@@ -536,6 +514,7 @@ anno.split <- function(anno){
 #' @param cores number of cores available for the analysis
 #' @param window.size window size used to restrict the concordance/discordance classification of each read pair
 #' 						DEFAULT: 50 as the maximum distance
+#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes						
 #'
 #' @return FDRP scores for the given annotation.
 #'
@@ -545,7 +524,12 @@ anno.split <- function(anno){
 #' @import doParallel
 #' @import parallel
 #' @export
-calculate.fdrp.score <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=get.option('WINDOW.SIZE')){
+calculate.fdrp.score <- function(bam.file,
+                                 anno,
+                                 log.path=getwd(),
+                                 cores=1,
+                                 window.size=get.option('WINDOW.SIZE'),
+                                 use.sex.chromosomes=FALSE){
   output.frame <- data.frame(chromosome=seqnames(anno),start=start(anno),end=end(anno))
   bam <- BamFile(bam.file)
   if(!file.exists(file.path(log.path,'log'))){
@@ -553,15 +537,7 @@ calculate.fdrp.score <- function(bam.file,anno,log.path=getwd(),cores=1,window.s
   }
   cl <- makeCluster(cores,outfile=file.path(log.path,'log','log_FDRP.log'))
   registerDoParallel(cl)
-  anno <- split(anno,seqnames(anno))
-  anno <- anno[lengths(anno)>0]
-  if(length(anno)>=22){
-    anno <- anno[1:22]
-    first <- anno.split(anno[[1]])
-    anno <- c(first,anno[2:22])
-    second <- anno.split(anno[[3]])
-    anno <- c(anno[1:2],second,anno[4:23])
-  }
+  anno <- prepare.annotation(anno,use.sex.chromosomes=use.sex.chromosomes)
   if(get.option('fdrp.type')=='FDRP'){
     logger.start("FDRP calculation")
     fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrp.by.chromosome','calculate.fdrp.site','compute.discordant','toCpGs','convert','restrict','set.option','get.option','IHS.OPTIONS')) %dopar%{
@@ -595,15 +571,23 @@ calculate.fdrp.score <- function(bam.file,anno,log.path=getwd(),cores=1,window.s
 #' @param cores number of cores available for the analysis
 #' @param window.size window size used to restrict the concordance/discordance classification of each read pair
 #' 						DEFAULT: 50 as the maximum distance
+#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes						
 #'
 #' @return FDRP scores for the given annotation.
 #'
 #' @author Michael Scherer
 #' @export
-calculate.fdrp <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=get.option('WINDOW.SIZE')){
+calculate.fdrp <- function(bam.file,
+                           anno,
+                           log.path=getwd(),
+                           cores=1,
+                           window.size=get.option('WINDOW.SIZE'),
+                           use.sex.chromosomes=FALSE){
   set.option(fdrp.type='FDRP')
-  anno <- remove.sex.chromosomes(anno)
-  qfdrp <- calculate.fdrp.score(bam.file,anno,log.path,cores)
+  if(!use.sex.chromosomes){
+    anno <- remove.sex.chromosomes(anno)
+  }
+  qfdrp <- calculate.fdrp.score(bam.file,anno,log.path,cores,use.sex.chromosomes = use.sex.chromosomes)
   return(qfdrp)
 }
 
@@ -619,15 +603,23 @@ calculate.fdrp <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=ge
 #' @param cores number of cores available for the analysis
 #' @param window.size window size used to restrict the concordance/discordance classification of each read pair
 #' 						DEFAULT: 50 as the maximum distance
+#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes						
 #'
 #' @return qFDRP scores for the given annotation.
 #'
 #' @author Michael Scherer
 #' @export
-calculate.qfdrp <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=get.option('WINDOW.SIZE')){
+calculate.qfdrp <- function(bam.file,
+                            anno,
+                            log.path=getwd(),
+                            cores=1,
+                            window.size=get.option('WINDOW.SIZE'),
+                            use.sex.chromosomes=FALSE){
   set.option(fdrp.type='qFDRP')
-  anno <- remove.sex.chromosomes(anno)
-  qfdrp <- calculate.fdrp.score(bam.file,anno,log.path,cores)
+  if(!use.sex.chromosomes){
+    anno <- remove.sex.chromosomes(anno)
+  }
+  qfdrp <- calculate.fdrp.score(bam.file,anno,log.path,cores,use.sex.chromosomes=use.sex.chromosomes)
   colnames(qfdrp)[ncol(qfdrp)] <- "qFDRP"
   return(qfdrp)
 }
@@ -642,6 +634,7 @@ calculate.qfdrp <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=g
 #' @param anno	annotation as a GRanges object with the CpG sites to be analyzed
 #' @param log.path location of the log file
 #' @param cores number of cores available for the analysis
+#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes						
 #'
 #' @return PDR scores for the given annotation.
 #'
@@ -651,9 +644,15 @@ calculate.qfdrp <- function(bam.file,anno,log.path=getwd(),cores=1,window.size=g
 #' @import doParallel
 #' @import parallel
 #' @export
-calculate.pdr <- function(bam.file,anno,log.path=getwd(),cores=1){
+calculate.pdr <- function(bam.file,
+                          anno,
+                          log.path=getwd(),
+                          cores=1,
+                          use.sex.chromosomes=FALSE){
   logger.start("PDR calculation")
-  anno <- remove.sex.chromosomes(anno)
+  if(!use.sex.chromosomes){
+    anno <- remove.sex.chromosomes(anno)
+  }  
   output.frame <- data.frame(chromosome=seqnames(anno),start=start(anno),end=end(anno))
   bam <- BamFile(bam.file)
   if(!file.exists(file.path(log.path,'log'))){
@@ -661,15 +660,7 @@ calculate.pdr <- function(bam.file,anno,log.path=getwd(),cores=1){
   }
   cl <- makeCluster(cores,outfile=file.path(log.path,'log','log_PDR.log'))
   registerDoParallel(cl)
-  anno <- split(anno,seqnames(anno))
-  anno <- anno[lengths(anno)>0]
-  if(length(anno)>=22){
-    anno <- anno[1:22]
-    first <- anno.split(anno[[1]])
-    anno <- c(first,anno[2:22])
-    second <- anno.split(anno[[3]])
-    anno <- c(anno[1:2],second,anno[4:23])
-  }
+  anno <- prepare.annotation(anno,use.sex.chromosomes=use.sex.chromosomes)
   pdrs <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.pdr.by.chromosome','calculate.pdr.site','classify.read','convert','IHS.OPTIONS')) %dopar%{
     calculate.pdr.by.chromosome(bam,chromosome)
   }

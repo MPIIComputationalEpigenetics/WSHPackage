@@ -175,6 +175,7 @@ wsh.run.example <- function(score="qfdrp"){
 #' @param rnb.set path to RnBSet contaning methylation, coverage and sample meta information
 #' @param score The WSH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
 #'               \code{entropy} or \code{mhl}
+#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes
 #'
 #' @return data frame containing the annotation and the computed WSH scores
 #' @author Michael Scherer
@@ -185,7 +186,10 @@ wsh.run.example <- function(score="qfdrp"){
 #' fdrp <- compute.score.rnb(bam.file=example.bam,rnb.set=example.rnb.set)
 #' }
 #' @export
-compute.score.rnb <- function(bam.file,rnb.set,score="qfdrp"){
+compute.score.rnb <- function(bam.file,
+                              rnb.set,
+                              score="qfdrp",
+                              use.sex.chromosomes=use.sex.chromosomes){
   wsh.check.validity(score)
   if(!(file.exists(bam.file))){
     stop(paste("File",bam.file,"does not exist"))
@@ -196,13 +200,13 @@ compute.score.rnb <- function(bam.file,rnb.set,score="qfdrp"){
     }
   }
   if(score=="qfdrp"){
-    ret <- rnb.calculate.qfdrp(rnb.set,bam.file)
+    ret <- rnb.calculate.qfdrp(rnb.set,bam.file,use.sex.chromosomes=use.sex.chromosomes)
   }
   if(score=="fdrp"){
-    ret <- rnb.calculate.fdrp(rnb.set,bam.file)
+    ret <- rnb.calculate.fdrp(rnb.set,bam.file,use.sex.chromosomes=use.sex.chromosomes)
   }
   if(score=="pdr"){
-    ret <- rnb.calculate.pdr(rnb.set,bam.file)
+    ret <- rnb.calculate.pdr(rnb.set,bam.file,use.sex.chromosomes=use.sex.chromosomes)
   }
   if(score=="mhl"){
     ret <- rnb.calculate.mhl(rnb.set,bam.file)
@@ -226,6 +230,7 @@ compute.score.rnb <- function(bam.file,rnb.set,score="qfdrp"){
 #' @param range GRanges object containing the annotation
 #' @param score The WSH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
 #'               \code{entropy} or \code{mhl}
+#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes
 #'
 #' @return data frame containing the annotation and the computed WSH scores
 #' @author Michael Scherer
@@ -236,7 +241,10 @@ compute.score.rnb <- function(bam.file,rnb.set,score="qfdrp"){
 #' fdrp <- compute.score.GRanges(bam.file=example.bam,range=example.GRanges)
 #' }
 #' @export
-compute.score.GRanges <- function(bam.file,range,score="qfdrp"){
+compute.score.GRanges <- function(bam.file,
+                                  range,
+                                  score="qfdrp",
+                                  use.sex.chromosomes=FALSE){
   wsh.check.validity(score)
   if(!(file.exists(bam.file))){
     stop(paste("File",bam.file,"does not exist"))
@@ -245,13 +253,13 @@ compute.score.GRanges <- function(bam.file,range,score="qfdrp"){
     stop(paste("Invalid value for range, needs to be a GRanges object"))
   }
   if(score=="qfdrp"){
-    ret <- calculate.qfdrp(bam.file,range)
+    ret <- calculate.qfdrp(bam.file,range,use.sex.chromosomes=use.sex.chromosomes)
   }
   if(score=="fdrp"){
-    ret <- calculate.fdrp(bam.file,range)
+    ret <- calculate.fdrp(bam.file,range,use.sex.chromosomes=use.sex.chromosomes)
   }
   if(score=="pdr"){
-    ret <- calculate.pdr(bam.file,range)
+    ret <- calculate.pdr(bam.file,range,use.sex.chromosomes=use.sex.chromosomes)
   }
   if(score=="mhl"){
     # do transformation of GRanges to bed file
@@ -280,6 +288,7 @@ compute.score.GRanges <- function(bam.file,range,score="qfdrp"){
 #' @param ... additional arugment. Either RnBSet, GRanges or empty (only for Epipolymorphism and Entropy)
 #' @param score The WSH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
 #'               \code{entropy} or \code{mhl}
+#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes
 #'
 #' @return data frame containing the annotation and the computed WSH scores
 #' @author Michael Scherer
@@ -292,7 +301,10 @@ compute.score.GRanges <- function(bam.file,range,score="qfdrp"){
 #' qfdrp <- compute.score(bam.file=example.bam,example.rnb.set,score="qfdrp")
 #' }
 #' @export
-compute.score <- function(bam.file,...,score="qfdrp"){
+compute.score <- function(bam.file,
+                          ...,
+                          score="qfdrp",
+                          use.sex.chromosomes=FALSE){
   wsh.check.validity(score)
   optlist <- list(...)
   if(length(optlist)==0&!(score%in%c("epipolymorphism","entropy"))){
@@ -311,9 +323,9 @@ compute.score <- function(bam.file,...,score="qfdrp"){
     }
   }else{
     if(inherits(optlist[[1]],"RnBSet")||is.character(optlist[[1]])){
-      res <- compute.score.rnb(bam.file=bam.file,rnb.set=optlist[[1]],score=score)
+      res <- compute.score.rnb(bam.file=bam.file,rnb.set=optlist[[1]],score=score,use.sex.chromosomes=use.sex.chromosomes)
     }else if(inherits(optlist[[1]],"GRanges")){
-      res <- compute.score.GRanges(bam.file = bam.file,range=optlist[[1]],score=score)
+      res <- compute.score.GRanges(bam.file = bam.file,range=optlist[[1]],score=score,use.sex.chromosomes=use.sex.chromosomes)
     }else{
       stop("Invalid value for additional argument, needs to be GRanges or RnBSet")
     }
@@ -351,7 +363,7 @@ remove.sex.chromosomes <- function(annotation){
   if(inherits(annotation,"RnBSet")){
     annotation <- rnb.execute.sex.removal(rnb.set=annotation)
   }else if(inherits(annotation,"GRanges")){
-    keep <- !(as.character(seqnames(annotation)) %in% c("chrX","X","chrY","y"))
+    keep <- !(as.character(seqnames(annotation)) %in% c("chrX","X","chrY","Y"))
     annotation <- annotation[keep]
   }else{
     stop("Invalid value for annotation.")

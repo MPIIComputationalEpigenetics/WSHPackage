@@ -4,7 +4,13 @@
 \alias{rnb.calculate.pdr}
 \title{rnb.calculate.pdr}
 \usage{
-rnb.calculate.pdr(rnb.set, bam.path, log.path = getwd(), cores = 1)
+rnb.calculate.pdr(
+  rnb.set,
+  bam.path,
+  log.path = getwd(),
+  cores = 1,
+  use.sex.chromosomes = FALSE
+)
 }
 \arguments{
 \item{rnb.set}{RnBSet object containing the CpG sites for which calculation should be conducted}
@@ -14,6 +20,8 @@ rnb.calculate.pdr(rnb.set, bam.path, log.path = getwd(), cores = 1)
 \item{log.path}{path to the log directory, if not existing it is created}
 
 \item{cores}{cores available for the analysis}
+
+\item{use.sex.chromosomes}{Flag indicating if scores are also to be computed for the sex chromosomes}
 }
 \value{
 PDR scores for the CpG sites in the RnBSet with a higher coverage than COVERAGE.THRESHOLD

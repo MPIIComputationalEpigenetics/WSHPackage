@@ -9,7 +9,8 @@ calculate.fdrp.score(
   anno,
   log.path = getwd(),
   cores = 1,
-  window.size = get.option("WINDOW.SIZE")
+  window.size = get.option("WINDOW.SIZE"),
+  use.sex.chromosomes = FALSE
 )
 }
 \arguments{
@@ -24,6 +25,8 @@ already aligned to a reference genome}
 
 \item{window.size}{window size used to restrict the concordance/discordance classification of each read pair
 DEFAULT: 50 as the maximum distance}
+
+\item{use.sex.chromosomes}{Flag indicating if scores are also to be computed for the sex chromosomes}
 }
 \value{
 FDRP scores for the given annotation.

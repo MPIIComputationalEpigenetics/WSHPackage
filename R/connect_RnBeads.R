@@ -4,10 +4,11 @@
 #' for the IHS score calculation
 #'
 #' @param rnb.path path to an RnBSet object stored in disk
+#' @param use.sex.chromosomes Flag indicating if the sex chromosomes are to be included into the analysis
 #'
 #' @return GRanges object containing the CpG sites of interest
 #' @noRd
-create.annotation <- function(rnb.path){
+create.annotation <- function(rnb.path,use.sex.chromosomes=FALSE){
   if(inherits(rnb.path,"RnBSet")){
     rnb.set <- rnb.path
   }else if(file.exists(rnb.path)){
@@ -23,13 +24,15 @@ create.annotation <- function(rnb.path){
     high_enough <- mean_coverage >= get.option('coverage.threshold')
     anno <- anno[high_enough,]
   }
-  if(all(c("chrX","chrY")%in%anno$Chromosome)){
-    anno <- anno[anno$Chromosome!="chrX",]
-    anno <- anno[anno$Chromosome!="chrY",]
-  }else if(all(c("X","Y")%in%anno$Chromosome)){
-    anno <- anno[anno$Chromosome!="X",]
-    anno <- anno[anno$Chromosome!="Y",]
-  }
+  if(!use.sex.chromosomes){
+    if(all(c("chrX","chrY")%in%anno$Chromosome)){
+      anno <- anno[anno$Chromosome!="chrX",]
+      anno <- anno[anno$Chromosome!="chrY",]
+    }else if(all(c("X","Y")%in%anno$Chromosome)){
+      anno <- anno[anno$Chromosome!="X",]
+      anno <- anno[anno$Chromosome!="Y",]
+    }
+  }  
   anno <- GRanges(Rle(anno$Chromosome),IRanges(start=anno$Start,end=anno$End),anno$Strand)
   names <- paste(as.character(seqnames(anno)),start(ranges(anno)),end(ranges(anno)),sep="_")
   unique <- unique(names)
@@ -46,6 +49,7 @@ create.annotation <- function(rnb.path){
 #' @param bam.path path to the bam file containing the reads
 #' @param log.path path to the log directory, if not existing it is created
 #' @param cores cores available for the analysis
+#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes
 #'
 #' @return FDRP scores for the CpG sites in the RnBSet with a higher coverage than COVERAGE.THRESHOLD
 #'
@@ -57,10 +61,14 @@ create.annotation <- function(rnb.path){
 #' fdrp <- rnb.calculate.fdrp(rnb.set=example.rnb.set,bam.path=example.bam)
 #' }
 #' @export
-rnb.calculate.fdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
+rnb.calculate.fdrp <- function(rnb.set,
+                               bam.path,
+                               log.path=getwd(),
+                               cores=1,
+                               use.sex.chromosomes = FALSE){
   logger.start("Computing FDRP from RnBSet object")
-  anno <- create.annotation(rnb.set)
-  fdrps <- calculate.fdrp(bam.path,anno,log.path=log.path,cores=cores)
+  anno <- create.annotation(rnb.set,use.sex.chromosomes = use.sex.chromosomes)
+  fdrps <- calculate.fdrp(bam.path,anno,log.path=log.path,cores=cores,use.sex.chromosomes = use.sex.chromosomes)
   logger.completed()
   return(fdrps)
 }
@@ -73,6 +81,7 @@ rnb.calculate.fdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
 #' @param bam.path path to the bam file containing the reads
 #' @param log.path path to the log directory, if not existing it is created
 #' @param cores cores available for the analysis
+#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes
 #'
 #' @return qFDRP scores for the CpG sites in the RnBSet with a higher coverage than COVERAGE.THRESHOLD
 #'
@@ -85,10 +94,14 @@ rnb.calculate.fdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
 #' }
 
 #' @export
-rnb.calculate.qfdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
+rnb.calculate.qfdrp <- function(rnb.set,
+                                bam.path,
+                                log.path=getwd(),
+                                cores=1,
+                                use.sex.chromosomes = FALSE){
   logger.start("Computing qFDRP from RnBSet object")
-  anno <- create.annotation(rnb.set)
-  qfdrps <- calculate.qfdrp(bam.path,anno,log.path=log.path,cores=cores)
+  anno <- create.annotation(rnb.set,use.sex.chromosomes=use.sex.chromosomes)
+  qfdrps <- calculate.qfdrp(bam.path,anno,log.path=log.path,cores=cores,use.sex.chromosomes=use.sex.chromosomes)
   logger.completed()
   return(qfdrps)
 }
@@ -101,6 +114,7 @@ rnb.calculate.qfdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
 #' @param bam.path path to the bam file containing the reads
 #' @param log.path path to the log directory, if not existing it is created
 #' @param cores cores available for the analysis
+#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes
 #'
 #' @return PDR scores for the CpG sites in the RnBSet with a higher coverage than COVERAGE.THRESHOLD
 #'
@@ -113,10 +127,14 @@ rnb.calculate.qfdrp <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
 #' }
 
 #' @export
-rnb.calculate.pdr <- function(rnb.set,bam.path,log.path=getwd(),cores=1){
+rnb.calculate.pdr <- function(rnb.set,
+                              bam.path,
+                              log.path=getwd(),
+                              cores=1,
+                              use.sex.chromosomes = FALSE){
   logger.start("Computing PDR from RnBSet object")
-  anno <- create.annotation(rnb.set)
-  pdrs <- calculate.pdr(bam.path,anno,log.path=log.path,cores=cores)
+  anno <- create.annotation(rnb.set,use.sex.chromosomes=use.sex.chromosomes)
+  pdrs <- calculate.pdr(bam.path,anno,log.path=log.path,cores=cores,use.sex.chromosomes = use.sex.chromosomes)
   logger.completed()
   return(pdrs)
 }
