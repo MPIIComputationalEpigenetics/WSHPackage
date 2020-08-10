@@ -9,7 +9,8 @@ calculate.pdr(
   anno,
   log.path = getwd(),
   cores = 1,
-  use.sex.chromosomes = FALSE
+  use.sex.chromosomes = FALSE,
+  ignore.strand = TRUE
 )
 }
 \arguments{
@@ -23,6 +24,8 @@ already aligned to a reference genome}
 \item{cores}{number of cores available for the analysis}
 
 \item{use.sex.chromosomes}{Flag indicating if scores are also to be computed for the sex chromosomes}
+
+\item{ignore.strand}{The \code{ignore.strand} parameter from the function \code{\link{findOverlaps}}}
 }
 \value{
 PDR scores for the given annotation.

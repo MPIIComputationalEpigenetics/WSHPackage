@@ -10,7 +10,8 @@ calculate.fdrp.score(
   log.path = getwd(),
   cores = 1,
   window.size = get.option("WINDOW.SIZE"),
-  use.sex.chromosomes = FALSE
+  use.sex.chromosomes = FALSE,
+  ignore.strand = TRUE
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ already aligned to a reference genome}
 DEFAULT: 50 as the maximum distance}
 
 \item{use.sex.chromosomes}{Flag indicating if scores are also to be computed for the sex chromosomes}
+
+\item{ignore.strand}{The \code{ignore.strand} parameter from the function \code{\link{findOverlaps}}}
 }
 \value{
 FDRP scores for the given annotation.

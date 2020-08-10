@@ -8,7 +8,8 @@ compute.score.rnb(
   bam.file,
   rnb.set,
   score = "qfdrp",
-  use.sex.chromosomes = use.sex.chromosomes
+  use.sex.chromosomes = use.sex.chromosomes,
+  ...
 )
 }
 \arguments{
@@ -20,6 +21,8 @@ compute.score.rnb(
 \code{entropy} or \code{mhl}}
 
 \item{use.sex.chromosomes}{Flag indicating if scores are also to be computed for the sex chromosomes}
+
+\item{...}{Further parameters passed to \code{calculate.*}}
 }
 \value{
 data frame containing the annotation and the computed WSH scores

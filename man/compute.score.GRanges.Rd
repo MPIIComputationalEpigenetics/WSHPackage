@@ -8,7 +8,8 @@ compute.score.GRanges(
   bam.file,
   range,
   score = "qfdrp",
-  use.sex.chromosomes = FALSE
+  use.sex.chromosomes = FALSE,
+  ...
 )
 }
 \arguments{
@@ -20,6 +21,8 @@ compute.score.GRanges(
 \code{entropy} or \code{mhl}}
 
 \item{use.sex.chromosomes}{Flag indicating if scores are also to be computed for the sex chromosomes}
+
+\item{...}{Further parameters passed to \code{calculate.*}}
 }
 \value{
 data frame containing the annotation and the computed WSH scores

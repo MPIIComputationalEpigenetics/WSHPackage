@@ -337,6 +337,7 @@ calculate.pdr.site <- function(cpg,reads){
 #' @param bam bam file with the reads from a bisulfite sequencing technique
 #'				already aligned to a reference genome
 #' @param anno annotation as a GRanges object with the CpG sites to be analyzed
+#' @param ignore.strand The \code{ignore.strand} parameter from the function \code{\link{findOverlaps}}
 #' @return vector of fdrp scores for the given CpG sites in anno
 #'
 #' @details This function is called by calculate.fdrps for each chromosome
@@ -348,7 +349,9 @@ calculate.pdr.site <- function(cpg,reads){
 #' @import Rsamtools
 #' @import GenomicAlignments
 #' @import rtracklayer
-calculate.fdrp.by.chromosome <- function(bam, anno){
+calculate.fdrp.by.chromosome <- function(bam,
+                                         anno,
+                                         ignore.strand=TRUE){
   chromosome <- as.character(seqnames(anno))[1]
   logger.start(paste('Calculation of',chromosome))
   start <- start(ranges(anno)[1])
@@ -368,7 +371,7 @@ calculate.fdrp.by.chromosome <- function(bam, anno){
   range_reads <- renameSeqlevels(range_reads,newStyle)
 
   # we only analyze those CpGs that are covered (on average) by enough reads in the complete dataset
-  overlap <- findOverlaps(range_reads,anno,ignore.strand=TRUE)
+  overlap <- findOverlaps(range_reads,anno,ignore.strand=ignore.strand)
   query <- queryHits(overlap)
   query <- unique(query)
   range_reads <- range_reads[query]
@@ -383,9 +386,9 @@ calculate.fdrp.by.chromosome <- function(bam, anno){
   rm(range_cpgs)
   seqs_reads <- as.character(values(range_reads)$seq)
   starts_reads <- start(ranges(range_reads))
-  overlap <- findOverlaps(range_reads,anno,ignore.strand=TRUE)
+  overlap <- findOverlaps(range_reads,anno,ignore.strand=ignore.strand)
   match_read_cpg <- as(overlap,"list")
-  overlap <- findOverlaps(anno,range_reads,ignore.strand=TRUE)
+  overlap <- findOverlaps(anno,range_reads,ignore.strand=ignore.strand)
   fdrps <- as.list(rep(NA,length(anno)))
   rm(anno)
   # for each read we convert the covered CpG sites into a custom representation
@@ -427,6 +430,7 @@ calculate.fdrp.by.chromosome <- function(bam, anno){
 #' @param bam bam file with the reads from a bisulfite sequencing technique
 #'				already aligned to a reference genome
 #' @param anno annotation as a GRanges object with the CpG sites to be analyzed
+#' @param ignore.strand The \code{ignore.strand} parameter from the function \code{\link{findOverlaps}}
 #' @return vector of pdr scores for the given CpG sites in anno
 #'
 #' @author Michael Scherer
@@ -435,7 +439,9 @@ calculate.fdrp.by.chromosome <- function(bam, anno){
 #' @import Rsamtools
 #' @import GenomicAlignments
 #' @import rtracklayer
-calculate.pdr.by.chromosome <- function(bam, anno){
+calculate.pdr.by.chromosome <- function(bam, 
+                                        anno,
+                                        ignore.strand=TRUE){
   chromosome <- as.character(seqnames(anno))[1]
   logger.start(paste('Calculation of',chromosome))
   start <- start(ranges(anno)[1])
@@ -455,7 +461,7 @@ calculate.pdr.by.chromosome <- function(bam, anno){
   range_reads <- renameSeqlevels(range_reads,newStyle)
 
   # we only analyze those CpGs that are covered (on average) by enough reads in the complete dataset
-  overlap <- findOverlaps(range_reads,anno,ignore.strand=TRUE)
+  overlap <- findOverlaps(range_reads,anno,ignore.strand=ignore.strand)
   query <- queryHits(overlap)
   query <- unique(query)
   range_reads <- range_reads[query]
@@ -468,9 +474,9 @@ calculate.pdr.by.chromosome <- function(bam, anno){
   rm(range_cpgs)
   seqs_reads <- as.character(values(range_reads)$seq)
   starts_reads <- start(ranges(range_reads))
-  overlap <- findOverlaps(range_reads,anno,ignore.strand=TRUE)
+  overlap <- findOverlaps(range_reads,anno,ignore.strand=ignore.strand)
   match_read_cpg <- as(overlap,"list")
-  overlap <- findOverlaps(anno,range_reads,ignore.strand=TRUE)
+  overlap <- findOverlaps(anno,range_reads,ignore.strand=ignore.strand)
   pdrs <- as.list(rep(NA,length(anno)))
   rm(anno)
   # we classify each read into either discordant or concordant
@@ -514,7 +520,8 @@ calculate.pdr.by.chromosome <- function(bam, anno){
 #' @param cores number of cores available for the analysis
 #' @param window.size window size used to restrict the concordance/discordance classification of each read pair
 #' 						DEFAULT: 50 as the maximum distance
-#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes						
+#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes
+#' @param ignore.strand The \code{ignore.strand} parameter from the function \code{\link{findOverlaps}}
 #'
 #' @return FDRP scores for the given annotation.
 #'
@@ -529,7 +536,8 @@ calculate.fdrp.score <- function(bam.file,
                                  log.path=getwd(),
                                  cores=1,
                                  window.size=get.option('WINDOW.SIZE'),
-                                 use.sex.chromosomes=FALSE){
+                                 use.sex.chromosomes=FALSE,
+                                 ignore.strand=TRUE){
   output.frame <- data.frame(chromosome=seqnames(anno),start=start(anno),end=end(anno))
   bam <- BamFile(bam.file)
   if(!file.exists(file.path(log.path,'log'))){
@@ -542,14 +550,14 @@ calculate.fdrp.score <- function(bam.file,
     logger.start("FDRP calculation")
     fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrp.by.chromosome','calculate.fdrp.site','compute.discordant','toCpGs','convert','restrict','set.option','get.option','IHS.OPTIONS')) %dopar%{
       set.option('fdrp.type'='FDRP')
-      calculate.fdrp.by.chromosome(bam,chromosome)
+      calculate.fdrp.by.chromosome(bam,chromosome,ignore.strand = ignore.strand)
     }
     logger.completed()
   }else{
     logger.start("qFDRP calculation")
     fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrp.by.chromosome','calculate.fdrp.site','compute.discordant','toCpGs','convert','restrict','set.option','get.option','IHS.OPTIONS')) %dopar%{
       set.option('fdrp.type'='qFDRP')
-      calculate.fdrp.by.chromosome(bam,chromosome)
+      calculate.fdrp.by.chromosome(bam,chromosome,ignore.strand = ignore.strand)
     }
     logger.completed()
   }
@@ -571,7 +579,8 @@ calculate.fdrp.score <- function(bam.file,
 #' @param cores number of cores available for the analysis
 #' @param window.size window size used to restrict the concordance/discordance classification of each read pair
 #' 						DEFAULT: 50 as the maximum distance
-#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes						
+#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes
+#' @param ignore.strand The \code{ignore.strand} parameter from the function \code{\link{findOverlaps}}
 #'
 #' @return FDRP scores for the given annotation.
 #'
@@ -582,12 +591,13 @@ calculate.fdrp <- function(bam.file,
                            log.path=getwd(),
                            cores=1,
                            window.size=get.option('WINDOW.SIZE'),
-                           use.sex.chromosomes=FALSE){
+                           use.sex.chromosomes=FALSE,
+                           ignore.strand=TRUE){
   set.option(fdrp.type='FDRP')
   if(!use.sex.chromosomes){
     anno <- remove.sex.chromosomes(anno)
   }
-  qfdrp <- calculate.fdrp.score(bam.file,anno,log.path,cores,use.sex.chromosomes = use.sex.chromosomes)
+  qfdrp <- calculate.fdrp.score(bam.file,anno,log.path,cores,use.sex.chromosomes = use.sex.chromosomes,ignore.strand = ignore.strand)
   return(qfdrp)
 }
 
@@ -603,7 +613,8 @@ calculate.fdrp <- function(bam.file,
 #' @param cores number of cores available for the analysis
 #' @param window.size window size used to restrict the concordance/discordance classification of each read pair
 #' 						DEFAULT: 50 as the maximum distance
-#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes						
+#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes
+#' @param ignore.strand The \code{ignore.strand} parameter from the function \code{\link{findOverlaps}}
 #'
 #' @return qFDRP scores for the given annotation.
 #'
@@ -614,12 +625,13 @@ calculate.qfdrp <- function(bam.file,
                             log.path=getwd(),
                             cores=1,
                             window.size=get.option('WINDOW.SIZE'),
-                            use.sex.chromosomes=FALSE){
+                            use.sex.chromosomes=FALSE,
+                            ignore.strand=TRUE){
   set.option(fdrp.type='qFDRP')
   if(!use.sex.chromosomes){
     anno <- remove.sex.chromosomes(anno)
   }
-  qfdrp <- calculate.fdrp.score(bam.file,anno,log.path,cores,use.sex.chromosomes=use.sex.chromosomes)
+  qfdrp <- calculate.fdrp.score(bam.file,anno,log.path,cores,use.sex.chromosomes=use.sex.chromosomes,ignore.strand = ignore.strand)
   colnames(qfdrp)[ncol(qfdrp)] <- "qFDRP"
   return(qfdrp)
 }
@@ -634,7 +646,8 @@ calculate.qfdrp <- function(bam.file,
 #' @param anno	annotation as a GRanges object with the CpG sites to be analyzed
 #' @param log.path location of the log file
 #' @param cores number of cores available for the analysis
-#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes						
+#' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes
+#' @param ignore.strand The \code{ignore.strand} parameter from the function \code{\link{findOverlaps}}
 #'
 #' @return PDR scores for the given annotation.
 #'
@@ -648,7 +661,8 @@ calculate.pdr <- function(bam.file,
                           anno,
                           log.path=getwd(),
                           cores=1,
-                          use.sex.chromosomes=FALSE){
+                          use.sex.chromosomes=FALSE,
+                          ignore.strand=TRUE){
   logger.start("PDR calculation")
   if(!use.sex.chromosomes){
     anno <- remove.sex.chromosomes(anno)
@@ -662,7 +676,7 @@ calculate.pdr <- function(bam.file,
   registerDoParallel(cl)
   anno <- prepare.annotation(anno,use.sex.chromosomes=use.sex.chromosomes)
   pdrs <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.pdr.by.chromosome','calculate.pdr.site','classify.read','convert','IHS.OPTIONS')) %dopar%{
-    calculate.pdr.by.chromosome(bam,chromosome)
+    calculate.pdr.by.chromosome(bam,chromosome,ignore.strand = ignore.strand)
   }
   stopCluster(cl)
   pdrs <- unlist(pdrs)

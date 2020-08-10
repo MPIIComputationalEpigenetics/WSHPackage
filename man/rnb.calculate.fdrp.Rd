@@ -9,7 +9,8 @@ rnb.calculate.fdrp(
   bam.path,
   log.path = getwd(),
   cores = 1,
-  use.sex.chromosomes = FALSE
+  use.sex.chromosomes = FALSE,
+  ...
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ rnb.calculate.fdrp(
 \item{cores}{cores available for the analysis}
 
 \item{use.sex.chromosomes}{Flag indicating if scores are also to be computed for the sex chromosomes}
+
+\item{...}{Further parameters passed to \link{calculate.fdrp}}
 }
 \value{
 FDRP scores for the CpG sites in the RnBSet with a higher coverage than COVERAGE.THRESHOLD

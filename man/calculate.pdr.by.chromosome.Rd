@@ -4,13 +4,15 @@
 \alias{calculate.pdr.by.chromosome}
 \title{calculate.pdr.by.chromosome}
 \usage{
-calculate.pdr.by.chromosome(bam, anno)
+calculate.pdr.by.chromosome(bam, anno, ignore.strand = TRUE)
 }
 \arguments{
 \item{bam}{bam file with the reads from a bisulfite sequencing technique
 already aligned to a reference genome}
 
 \item{anno}{annotation as a GRanges object with the CpG sites to be analyzed}
+
+\item{ignore.strand}{The \code{ignore.strand} parameter from the function \code{\link{findOverlaps}}}
 }
 \value{
 vector of pdr scores for the given CpG sites in anno

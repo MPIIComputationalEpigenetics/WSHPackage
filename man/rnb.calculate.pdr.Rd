@@ -9,7 +9,8 @@ rnb.calculate.pdr(
   bam.path,
   log.path = getwd(),
   cores = 1,
-  use.sex.chromosomes = FALSE
+  use.sex.chromosomes = FALSE,
+  ...
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ rnb.calculate.pdr(
 \item{cores}{cores available for the analysis}
 
 \item{use.sex.chromosomes}{Flag indicating if scores are also to be computed for the sex chromosomes}
+
+\item{...}{Further parameters passed to \link{calculate.pdr}}
 }
 \value{
 PDR scores for the CpG sites in the RnBSet with a higher coverage than COVERAGE.THRESHOLD

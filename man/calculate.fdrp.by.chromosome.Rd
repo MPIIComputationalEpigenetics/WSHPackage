@@ -6,13 +6,15 @@
 This function calculates the FDRP scores for the reads given in the bam files
 for the CpGs present in the annotation.}
 \usage{
-calculate.fdrp.by.chromosome(bam, anno)
+calculate.fdrp.by.chromosome(bam, anno, ignore.strand = TRUE)
 }
 \arguments{
 \item{bam}{bam file with the reads from a bisulfite sequencing technique
 already aligned to a reference genome}
 
 \item{anno}{annotation as a GRanges object with the CpG sites to be analyzed}
+
+\item{ignore.strand}{The \code{ignore.strand} parameter from the function \code{\link{findOverlaps}}}
 }
 \value{
 vector of fdrp scores for the given CpG sites in anno
