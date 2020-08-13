@@ -4,7 +4,13 @@
 \alias{compute.score}
 \title{compute.score}
 \usage{
-compute.score(bam.file, ..., score = "qfdrp", use.sex.chromosomes = FALSE)
+compute.score(
+  bam.file,
+  ...,
+  score = "qfdrp",
+  use.sex.chromosomes = FALSE,
+  ignore.strand = TRUE
+)
 }
 \arguments{
 \item{bam.file}{path to bam file containing the reads}
@@ -15,6 +21,8 @@ compute.score(bam.file, ..., score = "qfdrp", use.sex.chromosomes = FALSE)
 \code{entropy} or \code{mhl}}
 
 \item{use.sex.chromosomes}{Flag indicating if scores are also to be computed for the sex chromosomes}
+
+\item{ignore.strand}{The \code{ignore.strand} parameter from the function \code{\link{findOverlaps}}}
 }
 \value{
 data frame containing the annotation and the computed WSH scores

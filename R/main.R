@@ -293,6 +293,7 @@ compute.score.GRanges <- function(bam.file,
 #' @param score The WSH score which should be computed, needs to be one of \code{fdrp},\code{qfdrp},\code{pdr},\code{epipolymorphism},
 #'               \code{entropy} or \code{mhl}
 #' @param use.sex.chromosomes Flag indicating if scores are also to be computed for the sex chromosomes
+#' @param ignore.strand  The \code{ignore.strand} parameter from the function \code{\link{findOverlaps}}
 #'
 #' @return data frame containing the annotation and the computed WSH scores
 #' @author Michael Scherer
@@ -308,7 +309,8 @@ compute.score.GRanges <- function(bam.file,
 compute.score <- function(bam.file,
                           ...,
                           score="qfdrp",
-                          use.sex.chromosomes=FALSE){
+                          use.sex.chromosomes=FALSE,
+                          ignore.strand=TRUE){
   wsh.check.validity(score)
   optlist <- list(...)
   if(length(optlist)==0&!(score%in%c("epipolymorphism","entropy"))){
@@ -327,9 +329,9 @@ compute.score <- function(bam.file,
     }
   }else{
     if(inherits(optlist[[1]],"RnBSet")||is.character(optlist[[1]])){
-      res <- compute.score.rnb(bam.file=bam.file,rnb.set=optlist[[1]],score=score,use.sex.chromosomes=use.sex.chromosomes)
+      res <- compute.score.rnb(bam.file=bam.file,rnb.set=optlist[[1]],score=score,use.sex.chromosomes=use.sex.chromosomes,ignore.strand=ignore.strand)
     }else if(inherits(optlist[[1]],"GRanges")){
-      res <- compute.score.GRanges(bam.file = bam.file,range=optlist[[1]],score=score,use.sex.chromosomes=use.sex.chromosomes)
+      res <- compute.score.GRanges(bam.file = bam.file,range=optlist[[1]],score=score,use.sex.chromosomes=use.sex.chromosomes,ignore.strand=ignore.strand)
     }else{
       stop("Invalid value for additional argument, needs to be GRanges or RnBSet")
     }
