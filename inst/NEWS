@@ -1,4 +1,8 @@
 =====================================
+WSH version 0.1.5
+ * Fixed a bug in the computation for the sex chromosomes. Thanks to Raj Batra for reporting.
+
+=====================================
 WSH version 0.1.4
  * Enabled using the sex chromosomes in the calculation
 

@@ -353,11 +353,16 @@ calculate.fdrp.by.chromosome <- function(bam,
                                          anno,
                                          ignore.strand=TRUE){
   chromosome <- as.character(seqnames(anno))[1]
+  is.sex.chromosome <- grepl("X|Y|23|24",chromosome)
   logger.start(paste('Calculation of',chromosome))
   start <- start(ranges(anno)[1])
   end <- end(ranges(anno)[length(anno)])
   if(!(chromosome %in% names(scanBamHeader(bam)[[1]]))){
-    chromosome <- unique(na.omit(as.numeric(unlist(strsplit(chromosome,"[^0-9]+")))))
+    if(!is.sex.chromosome){
+        chromosome <- unique(na.omit(as.numeric(unlist(strsplit(chromosome,"[^0-9]+")))))
+    }else{
+        chromosome <- unique(gsub("chr","",chromosome))
+    }
   }
   which <- paste0(chromosome,":",start,"-",end)
   which <- GRanges(which)
@@ -443,11 +448,16 @@ calculate.pdr.by.chromosome <- function(bam,
                                         anno,
                                         ignore.strand=TRUE){
   chromosome <- as.character(seqnames(anno))[1]
+  is.sex.chromosome <- grepl("X|Y|23|24",chromosome)
   logger.start(paste('Calculation of',chromosome))
   start <- start(ranges(anno)[1])
   end <- end(ranges(anno)[length(anno)])
   if(!(chromosome %in% names(scanBamHeader(bam)[[1]]))){
-    chromosome <- unique(na.omit(as.numeric(unlist(strsplit(chromosome,"[^0-9]+")))))
+    if(!is.sex.chromosome){
+        chromosome <- unique(na.omit(as.numeric(unlist(strsplit(chromosome,"[^0-9]+")))))
+    }else{
+        chromosome <- unique(gsub("chr","",chromosome))
+    }
   }
   which <- paste0(chromosome,":",start,"-",end)
   which <- GRanges(which)
