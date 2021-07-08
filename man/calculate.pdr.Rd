@@ -9,6 +9,10 @@ calculate.pdr(
   anno,
   log.path = getwd(),
   cores = 1,
+  window.size = unname(get.option("window.size")),
+  max.reads = unname(get.option("max.reads")),
+  mapq.filter = unname(get.option("mapq.filter")),
+  coverage.threshold = unname(get.option("coverage.threshold")),
   use.sex.chromosomes = FALSE,
   ignore.strand = TRUE
 )

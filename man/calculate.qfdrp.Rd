@@ -9,7 +9,7 @@ calculate.qfdrp(
   anno,
   log.path = getwd(),
   cores = 1,
-  window.size = get.option("WINDOW.SIZE"),
+  window.size = get.option("window.size"),
   use.sex.chromosomes = FALSE,
   ignore.strand = TRUE
 )

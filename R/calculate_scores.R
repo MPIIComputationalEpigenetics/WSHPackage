@@ -352,6 +352,7 @@ calculate.pdr.site <- function(cpg,reads){
 calculate.fdrp.by.chromosome <- function(bam,
                                          anno,
                                          ignore.strand=TRUE){
+  print(get.option('max.reads'))
   chromosome <- as.character(seqnames(anno))[1]
   is.sex.chromosome <- grepl("X|Y|23|24",chromosome)
   logger.start(paste('Calculation of',chromosome))
@@ -545,7 +546,10 @@ calculate.fdrp.score <- function(bam.file,
                                  anno,
                                  log.path=getwd(),
                                  cores=1,
-                                 window.size=get.option('WINDOW.SIZE'),
+                                 window.size=unname(get.option('window.size')),
+                                 max.reads=unname(get.option('max.reads')),
+                                 mapq.filter=unname(get.option('mapq.filter')),
+                                 coverage.threshold=unname(get.option('coverage.threshold')),
                                  use.sex.chromosomes=FALSE,
                                  ignore.strand=TRUE){
   output.frame <- data.frame(chromosome=seqnames(anno),start=start(anno),end=end(anno))
@@ -558,14 +562,46 @@ calculate.fdrp.score <- function(bam.file,
   anno <- prepare.annotation(anno,use.sex.chromosomes=use.sex.chromosomes)
   if(get.option('fdrp.type')=='FDRP'){
     logger.start("FDRP calculation")
-    fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrp.by.chromosome','calculate.fdrp.site','compute.discordant','toCpGs','convert','restrict','set.option','get.option','IHS.OPTIONS')) %dopar%{
+    fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrp.by.chromosome',
+        'max.reads',
+        'calculate.fdrp.site',
+        'compute.discordant',
+        'mapq.filter',
+        'window.size',
+        'coverage.threshold',
+        'toCpGs',
+        'convert',
+        'restrict',
+        'set.option',
+        'get.option',
+        'IHS.OPTIONS')) %dopar%{
+      set.option(mapq.filter=mapq.filter)
+      set.option(coverage.threshold=coverage.threshold)
+      set.option(window.size=window.size)
+      set.option(max.reads=max.reads)
       set.option('fdrp.type'='FDRP')
       calculate.fdrp.by.chromosome(bam,chromosome,ignore.strand = ignore.strand)
     }
     logger.completed()
   }else{
     logger.start("qFDRP calculation")
-    fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrp.by.chromosome','calculate.fdrp.site','compute.discordant','toCpGs','convert','restrict','set.option','get.option','IHS.OPTIONS')) %dopar%{
+    fdrps <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.fdrp.by.chromosome',
+        'max.reads',
+        'calculate.fdrp.site',
+        'compute.discordant',
+        'mapq.filter',
+        'coverage.threshold',
+        'window.size',
+        'toCpGs',
+        'convert',
+        'restrict',
+        'set.option',
+        'get.option',
+        'IHS.OPTIONS')) %dopar%{
+      set.option(mapq.filter=mapq.filter)
+      set.option(coverage.threshold=coverage.threshold)
+      set.option(window.size=window.size)
+      set.option(max.reads=max.reads)
       set.option('fdrp.type'='qFDRP')
       calculate.fdrp.by.chromosome(bam,chromosome,ignore.strand = ignore.strand)
     }
@@ -600,7 +636,7 @@ calculate.fdrp <- function(bam.file,
                            anno,
                            log.path=getwd(),
                            cores=1,
-                           window.size=get.option('WINDOW.SIZE'),
+                           window.size=get.option('window.size'),
                            use.sex.chromosomes=FALSE,
                            ignore.strand=TRUE){
   set.option(fdrp.type='FDRP')
@@ -634,7 +670,7 @@ calculate.qfdrp <- function(bam.file,
                             anno,
                             log.path=getwd(),
                             cores=1,
-                            window.size=get.option('WINDOW.SIZE'),
+                            window.size=get.option('window.size'),
                             use.sex.chromosomes=FALSE,
                             ignore.strand=TRUE){
   set.option(fdrp.type='qFDRP')
@@ -671,6 +707,10 @@ calculate.pdr <- function(bam.file,
                           anno,
                           log.path=getwd(),
                           cores=1,
+                          window.size=unname(get.option('window.size')),
+                          max.reads=unname(get.option('max.reads')),
+                          mapq.filter=unname(get.option('mapq.filter')),
+                          coverage.threshold=unname(get.option('coverage.threshold')),
                           use.sex.chromosomes=FALSE,
                           ignore.strand=TRUE){
   logger.start("PDR calculation")
@@ -685,7 +725,21 @@ calculate.pdr <- function(bam.file,
   cl <- makeCluster(cores,outfile=file.path(log.path,'log','log_PDR.log'))
   registerDoParallel(cl)
   anno <- prepare.annotation(anno,use.sex.chromosomes=use.sex.chromosomes)
-  pdrs <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.pdr.by.chromosome','calculate.pdr.site','classify.read','convert','IHS.OPTIONS')) %dopar%{
+  pdrs <- foreach(chromosome=anno,.combine='c',.packages=c('RnBeads','GenomicAlignments','Rsamtools','rtracklayer'),.export=c('calculate.pdr.by.chromosome','calculate.pdr.site','classify.read',
+        'max.reads',
+        'mapq.filter',
+        'coverage.threshold',
+        'window.size',
+        'toCpGs',
+        'convert',
+        'restrict',
+        'set.option',
+        'get.option',
+        'IHS.OPTIONS')) %dopar%{
+      set.option(mapq.filter=mapq.filter)
+      set.option(coverage.threshold=coverage.threshold)
+      set.option(window.size=window.size)
+      set.option(max.reads=max.reads)
     calculate.pdr.by.chromosome(bam,chromosome,ignore.strand = ignore.strand)
   }
   stopCluster(cl)
