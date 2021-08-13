@@ -92,7 +92,7 @@ classify.read <- function(index,match_read_cpg,starts_cpgs,starts_reads,seqs_rea
 }
 
 
-#' compute.discordant
+#' restrict
 #' This function restricts a read to those CpG sites that are at most WINDOW.SIZE away from one
 #' another.
 #'
@@ -144,11 +144,6 @@ restrict <- function(positions,cpg){
           next
         }
         left <- distances[i.left]
-        if(get.option('window.size') < (left + right)){
-          remove[1:i.left] <- TRUE
-          finished.left <- TRUE
-          i.left <- min(which(!remove))
-        }
       }else{
         if((left < right) || all(remove[i.right:end])){
           i.left <- i.left - 1
@@ -158,11 +153,6 @@ restrict <- function(positions,cpg){
             next
           }
           left <- distances[i.left]
-          if(get.option('window.size') < (left + right)){
-            remove[1:i.left] <- TRUE
-            finished.left <- TRUE
-            i.left <- min(which(!remove))
-          }
         }else{
           i.right <- i.right + 1
           if(i.right > end){
@@ -171,13 +161,25 @@ restrict <- function(positions,cpg){
             next
           }
           right <- distances[i.right]
-          if(get.option('window.size') < (left + right)){
-            remove[i.right:end] <- TRUE
-            finished.right <- TRUE
-            i.right <- max(which(!remove))
-          }
         }
       }
+    }
+    # select which side to choose
+    if((left+right)>get.option('window.size')){
+        num.left <- pos - i.left
+        num.right <- i.right - pos
+        if(num.left<num.right){
+            remove[i.left:(pos-1)] <- TRUE
+        }else if(num.right<num.left){
+            remove[(pos+1):i.right] <- TRUE
+        }else{
+            select.side <- sample(1:2,1)
+            if(select.side==1){
+                remove[i.left:(pos-1)] <- TRUE
+            }else{
+                remove[(pos+1):i.right] <- TRUE
+            }
+        }
     }
     positions <- positions[!remove]
   }
