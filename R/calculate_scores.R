@@ -104,86 +104,20 @@ classify.read <- function(index,match_read_cpg,starts_cpgs,starts_reads,seqs_rea
 #' @noRd
 #' @author Michael Scherer
 restrict <- function(positions,cpg){
-  # We only restrict something, if the read is longer than 50 bp
   if(!any(positions == cpg)) return(NA)
   distances <- abs(as.numeric(positions)-as.numeric(cpg))
   positions <- positions[distances<=get.option('window.size')]
-  if((as.numeric(positions)[length(positions)]-as.numeric(positions)[1])>get.option('window.size')){
-    distances <- distances[distances<=get.option('window.size')]
-    end <- length(distances)
-    remove <- rep(FALSE,end)
-    pos <- match(cpg,positions)
-    if(is.na(pos)){
-      return(NA)
-    }
-    i.left <- pos-1
-    i.right <- pos+1
-    finished.left <- FALSE
-    finished.right <- FALSE
-    while((!finished.left) || (!finished.right)){
-      left <- distances[i.left]
-      right <- distances[i.right]
-      if(finished.left){
-        i.right <- i.right + 1
-        if(i.right > end){
-          finished.right <- TRUE
-          i.right <- end
-          next
-        }
-        right <- distances[i.right]
-        if(get.option('window.size') < (left + right)){
-          remove[i.right:end] <- TRUE
-          finished.right <- TRUE
-          i.right <- max(which(!remove))
-        }
-      }else if (finished.right){
-        i.left <- i.left - 1
-        if(i.left < 1){
-          finished.left <- TRUE
-          i.left <- 1
-          next
-        }
-        left <- distances[i.left]
-      }else{
-        if((left < right) || all(remove[i.right:end])){
-          i.left <- i.left - 1
-          if(i.left < 1){
-            finished.left <- TRUE
-            i.left <- 1
-            next
-          }
-          left <- distances[i.left]
-        }else{
-          i.right <- i.right + 1
-          if(i.right > end){
-            finished.right <- TRUE
-            i.right <- end
-            next
-          }
-          right <- distances[i.right]
-        }
-      }
-    }
-    # select which side to choose
-    if((left+right)>get.option('window.size')){
-        num.left <- pos - i.left
-        num.right <- i.right - pos
-        if(num.left<num.right){
-            remove[i.left:(pos-1)] <- TRUE
-        }else if(num.right<num.left){
-            remove[(pos+1):i.right] <- TRUE
-        }else{
-            select.side <- sample(1:2,1)
-            if(select.side==1){
-                remove[i.left:(pos-1)] <- TRUE
-            }else{
-                remove[(pos+1):i.right] <- TRUE
-            }
-        }
-    }
-    positions <- positions[!remove]
-  }
-  positions
+  all.valid.intervals <- sapply(min(as.numeric(positions)):max(as.numeric(positions)),function(x){
+    interval <- x:(x+(get.option('window.size')-1))
+    if(max(interval)>max(positions)) return(NULL)
+    if(!(cpg%in%interval)) return(NULL)
+    c(x,x+(get.option('window.size')-1),sum(interval%in%positions))
+  })
+  all.valid.intervals <- all.valid.intervals[sapply(all.valid.intervals,function(x)!is.null(x))]
+  interval.info <- t(as.data.frame(all.valid.intervals))
+  sel.interval <- interval.info[which.max(interval.info[,3]),]
+  positions <- positions[as.numeric(positions)>=sel.interval[1]&as.numeric(positions)<=sel.interval[2]]
+  return(positions)
 }
 
 #' compute.discordant
