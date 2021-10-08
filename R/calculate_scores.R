@@ -114,6 +114,7 @@ restrict <- function(positions,cpg){
     c(x,x+(get.option('window.size')-1),sum(interval%in%positions))
   })
   all.valid.intervals <- all.valid.intervals[sapply(all.valid.intervals,function(x)!is.null(x))]
+  if(length(all.valid.intervals)==0) return(positions)
   interval.info <- t(as.data.frame(all.valid.intervals))
   sel.interval <- interval.info[which.max(interval.info[,3]),]
   positions <- positions[as.numeric(positions)>=sel.interval[1]&as.numeric(positions)<=sel.interval[2]]
