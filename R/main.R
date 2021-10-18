@@ -269,7 +269,7 @@ compute.score.GRanges <- function(bam.file,
     # do transformation of GRanges to bed file
     range.table <- data.frame(Chromosome=seqnames(range),Start=start(range),End=end(range))
     mhl.file <- paste0(tempfile(pattern="WSH_"),".bed")
-    write.table(range.table,mhl.file,sep="\t",row.names = F)
+    write.table(range.table,mhl.file,sep="\t",row.names=FALSE,quote=FALSE)
     ret <- calculate.mhl(mhl.file,bam.file)
   }
   if(score%in%c("epipolymorphism","entropy")){
